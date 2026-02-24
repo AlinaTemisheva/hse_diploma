@@ -1,0 +1,159 @@
+{
+  "identity": {
+    "persona": "E1",
+    "tone": "Academic, Professional, Clean, Trustworthy",
+    "theme": "light",
+    "principles": [
+      "Clarity over decoration",
+      "Academic rigor meets digital ease",
+      "Whitespace is active space",
+      "Blue is the color of trust"
+    ]
+  },
+  "typography": {
+    "font_family": {
+      "headings": "Manrope, sans-serif",
+      "body": "Inter, sans-serif",
+      "mono": "JetBrains Mono, monospace"
+    },
+    "scale": {
+      "h1": "text-4xl md:text-5xl font-bold tracking-tight",
+      "h2": "text-3xl font-semibold tracking-tight",
+      "h3": "text-2xl font-semibold",
+      "h4": "text-xl font-medium",
+      "body_lg": "text-lg leading-relaxed",
+      "body_base": "text-base leading-relaxed text-gray-600",
+      "caption": "text-sm text-gray-500",
+      "small": "text-xs font-medium uppercase tracking-wider text-gray-400"
+    }
+  },
+  "colors": {
+    "palette": {
+      "primary": {
+        "DEFAULT": "#1B318E",
+        "foreground": "#FFFFFF",
+        "50": "#EEF2FF",
+        "100": "#E0E7FF",
+        "200": "#C7D2FE",
+        "300": "#A5B4FC",
+        "400": "#818CF8",
+        "500": "#6366F1",
+        "600": "#4F46E5",
+        "700": "#1B318E",
+        "800": "#3730A3",
+        "900": "#312E81"
+      },
+      "background": {
+        "DEFAULT": "#F5F7FA",
+        "paper": "#FFFFFF"
+      },
+      "text": {
+        "primary": "#111827",
+        "secondary": "#6B7280",
+        "tertiary": "#9CA3AF"
+      },
+      "accent": {
+        "teal": "#14B8A6",
+        "rose": "#F43F5E",
+        "amber": "#F59E0B"
+      },
+      "border": "#E5E7EB"
+    },
+    "usage": {
+      "primary_button": "bg-[#1B318E] hover:bg-[#1B318E]/90 text-white shadow-md",
+      "secondary_button": "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50",
+      "active_tab": "bg-[#1B318E] text-white shadow-sm",
+      "inactive_tab": "bg-transparent text-gray-500 hover:text-gray-900"
+    }
+  },
+  "components": {
+    "buttons": {
+      "default": "rounded-lg font-medium transition-all duration-200 active:scale-95",
+      "primary": "bg-[#1B318E] text-white hover:bg-[#2A42A5]",
+      "ghost": "hover:bg-gray-100 text-gray-600"
+    },
+    "cards": {
+      "default": "bg-white rounded-xl border border-gray-100 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] transition-shadow duration-300",
+      "hover_effect": "hover:-translate-y-1 transition-transform duration-300"
+    },
+    "inputs": {
+      "default": "rounded-lg border-gray-200 focus:border-[#1B318E] focus:ring-2 focus:ring-[#1B318E]/20 bg-white"
+    },
+    "tabs": {
+      "container": "bg-gray-100/50 p-1 rounded-xl",
+      "trigger": "rounded-lg px-4 py-2 text-sm font-medium transition-all data-[state=active]:bg-white data-[state=active]:text-[#1B318E] data-[state=active]:shadow-sm"
+    }
+  },
+  "layout_strategies": {
+    "login_page": {
+      "structure": "grid grid-cols-1 lg:grid-cols-2 h-screen w-full overflow-hidden",
+      "left_panel": "flex flex-col justify-center items-center p-8 lg:p-16 bg-white",
+      "right_panel": "hidden lg:block bg-gray-50 relative"
+    },
+    "dashboard": {
+      "wrapper": "min-h-screen bg-[#F5F7FA]",
+      "container": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8",
+      "header": "sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200 h-16 flex items-center justify-between px-6",
+      "grid": "grid grid-cols-1 md:grid-cols-12 gap-6"
+    }
+  },
+  "assets": {
+    "images": {
+      "login_carousel": [
+        {
+          "url": "https://images.unsplash.com/photo-1764058415544-6c5bd4659a88?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzNDR8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjB1bml2ZXJzaXR5JTIwY2FtcHVzJTIwYnVpbGRpbmclMjBleHRlcmlvcnxlbnwwfHx8fDE3NzE5NjI1NTJ8MA&ixlib=rb-4.1.0&q=85",
+          "alt": "HSE Campus Exterior",
+          "caption": "Modern Learning Spaces"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1758270704925-fa59d93119c1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTF8MHwxfHNlYXJjaHwzfHx1bml2ZXJzaXR5JTIwcHJvZmVzc29yJTIwdGVhY2hpbmclMjBsZWN0dXJlJTIwaGFsbHxlbnwwfHx8fDE3NzE5NjI1NTJ8MA&ixlib=rb-4.1.0&q=85",
+          "alt": "Professor Teaching",
+          "caption": "Excellence in Teaching"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1741699427706-7bfb38c716d8?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwzfHx1bml2ZXJzaXR5JTIwc3R1ZGVudCUyMGdyb3VwJTIwc3R1ZHlpbmclMjBsaWJyYXJ5fGVufDB8fHx8MTc3MTk2MjU1M3ww&ixlib=rb-4.1.0&q=85",
+          "alt": "Library Study",
+          "caption": "Access to Knowledge"
+        },
+        {
+          "url": "https://images.unsplash.com/photo-1758573467240-f944226c2026?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA3MDR8MHwxfHNlYXJjaHw0fHxhY2FkZW1pYyUyMHJlc2VhcmNoJTIwbGFib3JhdG9yeSUyMHNjaWVudGlzdHN8ZW58MHx8fHwxNzcxOTYyNTU0fDA&ixlib=rb-4.1.0&q=85",
+          "alt": "Research Lab",
+          "caption": "Cutting-edge Research"
+        }
+      ],
+      "placeholders": {
+        "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=Ivan",
+        "service_icon_bg": "bg-[#E0E7FF] text-[#1B318E]"
+      }
+    },
+    "icons": {
+      "library": "Lucide: Library",
+      "website": "Lucide: Globe",
+      "email": "Lucide: Mail",
+      "schedule": "Lucide: Calendar",
+      "lms": "Lucide: GraduationCap",
+      "hr": "Lucide: Users",
+      "tasks": "Lucide: CheckSquare",
+      "docs": "Lucide: FileText"
+    }
+  },
+  "instructions_to_main_agent": [
+    "1. THEME: Force LIGHT MODE. Do not implement dark mode toggle as this is an academic dashboard.",
+    "2. COLORS: Update tailwind.config.js to use #1B318E as primary color. Ensure backgrounds are #F5F7FA.",
+    "3. FONTS: Import Manrope for headings and Inter for body from Google Fonts.",
+    "4. COMPONENTS: Use Shadcn components (Card, Tabs, Button, Input, Checkbox) but customized with the E1 guidelines.",
+    "5. LAYOUT: Strict adherence to the provided screenshots. Login page must have the carousel on the right (desktop). Dashboard must have the 'Services' section as a horizontal scrollable row.",
+    "6. MICRO-INTERACTIONS: Add hover states to service cards (lift up + shadow). Add smooth transitions to tab switching.",
+    "7. DATA: Use mock data for tasks, courses, and documents to make the dashboard feel populated.",
+    "8. ACCESSIBILITY: Ensure all text over images has proper contrast or scrims. All interactive elements must have aria-labels.",
+    "9. TESTID: Add data-testid to all interactive elements (buttons, inputs, tabs) for testing."
+  ],
+  "universal_guidelines": [
+    "Avoid generic centered layouts.",
+    "Use glass-morphism effects for the sticky header.",
+    "Never use generic AI emojis.",
+    "Ensure 2-3x more spacing than typical designs.",
+    "Use 'sonner' for toasts.",
+    "Components must use named exports."
+  ]
+}
