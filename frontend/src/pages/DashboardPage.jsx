@@ -182,29 +182,55 @@ export default function DashboardPage({ user, onLogout }) {
 
         {/* Tabs Section */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full h-auto p-1 bg-[#EBEEF2] rounded-xl flex" data-testid="tabs-list">
+          <TabsList 
+            className="w-full h-auto flex" 
+            style={{ backgroundColor: '#EBEEF2', padding: '4px', borderRadius: '12px' }}
+            data-testid="tabs-list"
+          >
             <TabsTrigger 
               value="tasks" 
-              className="flex-1 py-3 px-2 rounded-lg text-sm font-medium transition-all data-[state=active]:bg-white data-[state=active]:text-[#1B318E] data-[state=active]:shadow-md data-[state=inactive]:bg-transparent data-[state=inactive]:text-gray-500"
+              className="flex-1 py-3 px-2 text-sm font-medium transition-all"
+              style={{ 
+                borderRadius: '10px',
+                backgroundColor: activeTab === 'tasks' ? 'white' : 'transparent',
+                color: activeTab === 'tasks' ? '#1B318E' : '#6B7280',
+                boxShadow: activeTab === 'tasks' ? '0 2px 8px rgba(0,0,0,0.08)' : 'none',
+                fontWeight: activeTab === 'tasks' ? '600' : '500'
+              }}
               data-testid="tasks-tab"
             >
               <span className="hidden sm:inline">Задачи {stats.tasks_completed} из {stats.tasks_total}</span>
-              <span className="sm:hidden">Задачи {stats.tasks_completed}/{stats.tasks_total}</span>
+              <span className="sm:hidden text-xs">Задачи {stats.tasks_completed}/{stats.tasks_total}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="learning" 
-              className="flex-1 py-3 px-2 rounded-lg text-sm font-medium transition-all data-[state=active]:bg-white data-[state=active]:text-[#1B318E] data-[state=active]:shadow-md data-[state=inactive]:bg-transparent data-[state=inactive]:text-gray-500"
+              className="flex-1 py-3 px-2 text-sm font-medium transition-all"
+              style={{ 
+                borderRadius: '10px',
+                backgroundColor: activeTab === 'learning' ? 'white' : 'transparent',
+                color: activeTab === 'learning' ? '#1B318E' : '#6B7280',
+                boxShadow: activeTab === 'learning' ? '0 2px 8px rgba(0,0,0,0.08)' : 'none',
+                fontWeight: activeTab === 'learning' ? '600' : '500'
+              }}
               data-testid="learning-tab"
             >
               <span className="hidden sm:inline">Обучение {stats.courses_completed} из {stats.courses_total}</span>
-              <span className="sm:hidden">Обучение {stats.courses_completed}/{stats.courses_total}</span>
+              <span className="sm:hidden text-xs">Обучение {stats.courses_completed}/{stats.courses_total}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="documents" 
-              className="flex-1 py-3 px-2 rounded-lg text-sm font-medium transition-all data-[state=active]:bg-white data-[state=active]:text-[#1B318E] data-[state=active]:shadow-md data-[state=inactive]:bg-transparent data-[state=inactive]:text-gray-500"
+              className="flex-1 py-3 px-2 text-sm font-medium transition-all"
+              style={{ 
+                borderRadius: '10px',
+                backgroundColor: activeTab === 'documents' ? 'white' : 'transparent',
+                color: activeTab === 'documents' ? '#1B318E' : '#6B7280',
+                boxShadow: activeTab === 'documents' ? '0 2px 8px rgba(0,0,0,0.08)' : 'none',
+                fontWeight: activeTab === 'documents' ? '600' : '500'
+              }}
               data-testid="documents-tab"
             >
-              Документы
+              <span className="hidden sm:inline">Документы</span>
+              <span className="sm:hidden text-xs">Документы</span>
             </TabsTrigger>
           </TabsList>
 
