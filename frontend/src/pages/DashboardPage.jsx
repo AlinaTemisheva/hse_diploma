@@ -103,13 +103,13 @@ export default function DashboardPage({ user, onLogout }) {
   };
 
   return (
-    <div className="dashboard-container" data-testid="dashboard-page">
+    <div className="min-h-screen bg-[#F0F0F5]" data-testid="dashboard-page">
       {/* Header */}
-      <header className="dashboard-header">
-        <div className="max-w-[960px] mx-auto w-full px-4 md:px-8 flex items-center justify-between h-full">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 h-16">
+        <div className="max-w-[1000px] mx-auto w-full px-4 md:px-8 flex items-center justify-between h-full">
           <div className="flex items-center gap-3">
-            <div className="logo-icon">
-              <span>В</span>
+            <div className="w-10 h-10 rounded-full bg-[#1B318E] flex items-center justify-center">
+              <span className="text-white text-lg font-bold">В</span>
             </div>
             <h1 className="text-xl font-bold text-[#1B318E] font-heading">
               Онбординг
@@ -120,10 +120,11 @@ export default function DashboardPage({ user, onLogout }) {
             <span className="text-gray-700 font-medium hidden sm:block" data-testid="user-name">
               {user?.name}
             </span>
-            <div className="user-avatar">
+            <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-200">
               <img 
                 src={user?.avatar_url || "https://api.dicebear.com/7.x/avataaars/svg?seed=Default"} 
                 alt={user?.name}
+                className="w-full h-full object-cover"
                 data-testid="user-avatar"
               />
             </div>
@@ -139,44 +140,45 @@ export default function DashboardPage({ user, onLogout }) {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="dashboard-content">
-        {/* Hero Card */}
-        <div className="hero-card" data-testid="hero-card">
-          <h2 className="text-xl font-bold text-gray-900 mb-2 font-heading">
-            Все для быстрого старта
-          </h2>
-          <p className="text-gray-600 text-sm leading-relaxed">
-            Здесь — все, что нужно для первых недель работы: документы, шаблоны, доступы, методические рекомендации и короткие курсы по основам преподавания. Сфокусируйтесь на содержании — мы поможем с процессами
-          </p>
-        </div>
-
-        {/* Services Section */}
-        <section className="services-section">
-          <h3 className="text-lg font-bold text-gray-900 mb-4 font-heading">Сервисы</h3>
-          <div className="services-scroll" data-testid="services-list">
-            {services.map((service) => {
-              const IconComponent = SERVICE_ICONS[service.icon] || Globe;
-              return (
-                <a
-                  key={service.id}
-                  href={service.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="service-card"
-                  data-testid={`service-${service.id}`}
-                >
-                  <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center">
-                    <IconComponent className="w-6 h-6 text-gray-600" />
-                  </div>
-                  <span className="text-sm text-gray-700 text-center whitespace-nowrap">
-                    {service.name}
-                  </span>
-                </a>
-              );
-            })}
+      {/* Main Content - White Paper */}
+      <main className="max-w-[1000px] mx-auto px-4 md:px-8 py-6">
+        <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8">
+          {/* Hero Card */}
+          <div className="bg-[#FAFAFB] rounded-xl p-5 mb-8" data-testid="hero-card">
+            <h2 className="text-xl font-bold text-gray-900 mb-2 font-heading">
+              Все для быстрого старта
+            </h2>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              Здесь — все, что нужно для первых недель работы: документы, шаблоны, доступы, методические рекомендации и короткие курсы по основам преподавания. Сфокусируйтесь на содержании — мы поможем с процессами
+            </p>
           </div>
-        </section>
+
+          {/* Services Section */}
+          <section className="mb-8">
+            <h3 className="text-lg font-bold text-gray-900 mb-4 font-heading">Сервисы</h3>
+            <div className="flex gap-3 overflow-x-auto pb-2 -mx-2 px-2" data-testid="services-list">
+              {services.map((service) => {
+                const IconComponent = SERVICE_ICONS[service.icon] || Globe;
+                return (
+                  <a
+                    key={service.id}
+                    href={service.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex flex-col items-center gap-2 p-3 min-w-[90px] rounded-xl hover:bg-gray-50 transition-colors"
+                    data-testid={`service-${service.id}`}
+                  >
+                    <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center">
+                      <IconComponent className="w-6 h-6 text-gray-600" />
+                    </div>
+                    <span className="text-xs text-gray-700 text-center whitespace-nowrap">
+                      {service.name}
+                    </span>
+                  </a>
+                );
+              })}
+            </div>
+          </section>
 
         {/* Tabs Section */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
