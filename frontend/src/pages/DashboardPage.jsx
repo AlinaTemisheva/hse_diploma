@@ -45,7 +45,7 @@ export default function DashboardPage({ user, onLogout }) {
   const [courses, setCourses] = useState([]);
   const [documents, setDocuments] = useState([]);
   const [services, setServices] = useState([]);
-  const [stats, setStats] = useState({ tasks_completed: 0, tasks_total: 0, courses_completed: 0, courses_total: 0 });
+  const [stats, setStats] = useState({ tasks_completed: 2, tasks_total: 5, courses_completed: 2, courses_total: 6 });
   const [activeTab, setActiveTab] = useState("tasks");
   const [isLoading, setIsLoading] = useState(true);
 
