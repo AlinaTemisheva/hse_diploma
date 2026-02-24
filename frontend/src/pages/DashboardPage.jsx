@@ -182,24 +182,26 @@ export default function DashboardPage({ user, onLogout }) {
 
         {/* Tabs Section */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="tabs-container" data-testid="tabs-list">
+          <TabsList className="w-full h-auto p-1 bg-[#EBEEF2] rounded-xl flex" data-testid="tabs-list">
             <TabsTrigger 
               value="tasks" 
-              className="tab-trigger"
+              className="flex-1 py-3 px-2 rounded-lg text-sm font-medium transition-all data-[state=active]:bg-white data-[state=active]:text-[#1B318E] data-[state=active]:shadow-md data-[state=inactive]:bg-transparent data-[state=inactive]:text-gray-500"
               data-testid="tasks-tab"
             >
-              Задачи {stats.tasks_completed} из {stats.tasks_total}
+              <span className="hidden sm:inline">Задачи {stats.tasks_completed} из {stats.tasks_total}</span>
+              <span className="sm:hidden">Задачи {stats.tasks_completed}/{stats.tasks_total}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="learning" 
-              className="tab-trigger"
+              className="flex-1 py-3 px-2 rounded-lg text-sm font-medium transition-all data-[state=active]:bg-white data-[state=active]:text-[#1B318E] data-[state=active]:shadow-md data-[state=inactive]:bg-transparent data-[state=inactive]:text-gray-500"
               data-testid="learning-tab"
             >
-              Обучение {stats.courses_completed} из {stats.courses_total}
+              <span className="hidden sm:inline">Обучение {stats.courses_completed} из {stats.courses_total}</span>
+              <span className="sm:hidden">Обучение {stats.courses_completed}/{stats.courses_total}</span>
             </TabsTrigger>
             <TabsTrigger 
               value="documents" 
-              className="tab-trigger"
+              className="flex-1 py-3 px-2 rounded-lg text-sm font-medium transition-all data-[state=active]:bg-white data-[state=active]:text-[#1B318E] data-[state=active]:shadow-md data-[state=inactive]:bg-transparent data-[state=inactive]:text-gray-500"
               data-testid="documents-tab"
             >
               Документы
