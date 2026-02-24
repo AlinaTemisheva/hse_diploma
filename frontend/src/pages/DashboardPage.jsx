@@ -182,7 +182,7 @@ export default function DashboardPage({ user, onLogout }) {
 
         {/* Tabs Section */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="tabs-container w-full grid grid-cols-3 mb-6" data-testid="tabs-list">
+          <TabsList className="tabs-container" data-testid="tabs-list">
             <TabsTrigger 
               value="tasks" 
               className="tab-trigger"
