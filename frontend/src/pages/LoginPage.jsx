@@ -9,23 +9,23 @@ import axios from "axios";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-// Carousel slides data matching Figma design
+// Carousel slides data matching Figma design exactly
 const CAROUSEL_SLIDES = [
   {
     id: 1,
-    image: "/images/whale.svg",
+    image: "/images/slide1-whale.svg",
     title: "Разберитесь в правилах за 15 минут",
     description: "Ключевые требования и цифровые сервисы — кратко и по делу, без погружения в лишние регламенты"
   },
   {
     id: 2,
-    image: "/images/person-books.svg",
-    title: "Всё в одном месте",
-    description: "Документы, шаблоны, курсы и чек-листы — структурированный путь к первому занятию"
+    image: "/images/slide2-meditation.svg",
+    title: "Осваивайте только то, что нужно для работы",
+    description: "Короткие практические блоки, которые можно пройти за несколько минут и сразу применить в работе"
   },
   {
     id: 3,
-    image: "/images/person-idea.svg",
+    image: "/images/slide3-idea.svg",
     title: "Минимум бюрократии — Максимум ясности",
     description: "Все требования, сервисы и обязательные шаги — в одном месте, чтобы вы были готовы к занятию без лишних уточнений"
   }
@@ -75,146 +75,132 @@ export default function LoginPage({ onLogin }) {
   };
 
   return (
-    <div className="login-container" data-testid="login-page">
-      {/* Left side - Carousel */}
-      <div className="login-carousel">
-        <div className="carousel-slide">
-          <div className="w-full flex justify-center mb-6">
-            {/* Placeholder for illustration - using emoji representation */}
-            <div className="w-64 h-64 flex items-center justify-center">
-              {currentSlide === 0 && (
-                <svg viewBox="0 0 200 200" className="w-full h-full">
-                  {/* Whale illustration placeholder */}
-                  <ellipse cx="100" cy="120" rx="70" ry="40" fill="#E8E8F0" />
-                  <ellipse cx="100" cy="100" rx="60" ry="35" fill="#FFFFFF" stroke="#333" strokeWidth="2" />
-                  <circle cx="75" cy="95" r="5" fill="#333" />
-                  <path d="M50 80 L40 50 L60 70" fill="#E8FF00" stroke="#333" strokeWidth="2" />
-                  <path d="M130 85 Q150 70 160 90" fill="none" stroke="#333" strokeWidth="2" />
-                  <ellipse cx="40" cy="130" rx="15" ry="8" fill="#E8E8F0" />
-                  <path d="M170 60 Q180 50 175 65 Q185 55 180 70" fill="none" stroke="#333" strokeWidth="2" />
-                </svg>
-              )}
-              {currentSlide === 1 && (
-                <svg viewBox="0 0 200 200" className="w-full h-full">
-                  {/* Person with books illustration */}
-                  <rect x="60" y="140" width="80" height="50" rx="5" fill="#E8E8F0" />
-                  <rect x="70" y="130" width="60" height="15" rx="3" fill="#1B318E" />
-                  <rect x="75" y="120" width="50" height="15" rx="3" fill="#4F46E5" />
-                  <circle cx="100" cy="80" r="25" fill="#FFE4C4" />
-                  <path d="M85 75 Q100 85 115 75" fill="none" stroke="#333" strokeWidth="2" />
-                  <circle cx="92" cy="72" r="3" fill="#333" />
-                  <circle cx="108" cy="72" r="3" fill="#333" />
-                </svg>
-              )}
-              {currentSlide === 2 && (
-                <svg viewBox="0 0 200 200" className="w-full h-full">
-                  {/* Person with lightbulb illustration */}
-                  <circle cx="100" cy="40" r="20" fill="#FFFF00" stroke="#333" strokeWidth="2" />
-                  <path d="M90 55 L95 70 L105 70 L110 55" fill="#FFFF00" stroke="#333" strokeWidth="2" />
-                  <circle cx="100" cy="110" r="30" fill="#FFE4C4" />
-                  <path d="M85 105 Q100 115 115 105" fill="none" stroke="#333" strokeWidth="2" />
-                  <circle cx="92" cy="102" r="3" fill="#333" />
-                  <circle cx="108" cy="102" r="3" fill="#333" />
-                  <rect x="70" y="140" width="60" height="50" rx="5" fill="#E8FF00" />
-                </svg>
-              )}
+    <div className="min-h-screen bg-[#F0F0F5] flex items-center justify-center p-4 lg:p-8" data-testid="login-page">
+      <div className="w-full max-w-[1000px] bg-white rounded-3xl shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-2 min-h-[600px]">
+        
+        {/* Left side - Carousel */}
+        <div className="bg-[#E8E0F0] p-8 lg:p-12 flex flex-col justify-between hidden lg:flex">
+          {/* Image container */}
+          <div className="flex-1 flex items-center justify-center mb-6">
+            <div className="w-full max-w-[320px] h-[280px] relative">
+              <img 
+                src={CAROUSEL_SLIDES[currentSlide].image}
+                alt={CAROUSEL_SLIDES[currentSlide].title}
+                className="w-full h-full object-contain transition-opacity duration-500"
+                data-testid={`carousel-image-${currentSlide}`}
+              />
             </div>
           </div>
           
-          <h2 className="text-2xl font-bold text-[#1B318E] mb-2 font-heading">
-            {CAROUSEL_SLIDES[currentSlide].title}
-          </h2>
-          <p className="text-gray-600 text-sm leading-relaxed">
-            {CAROUSEL_SLIDES[currentSlide].description}
-          </p>
-          
-          {/* Carousel dots */}
-          <div className="carousel-dots">
-            {CAROUSEL_SLIDES.map((_, index) => (
-              <button
-                key={index}
-                className={`carousel-dot ${index === currentSlide ? 'active' : ''}`}
-                onClick={() => setCurrentSlide(index)}
-                aria-label={`Слайд ${index + 1}`}
-                data-testid={`carousel-dot-${index}`}
-              />
-            ))}
+          {/* Text content */}
+          <div className="space-y-4">
+            <h2 className="text-2xl lg:text-[28px] font-bold text-[#1B318E] leading-tight font-heading">
+              {CAROUSEL_SLIDES[currentSlide].title}
+            </h2>
+            <p className="text-gray-600 text-base leading-relaxed">
+              {CAROUSEL_SLIDES[currentSlide].description}
+            </p>
+            
+            {/* Carousel dots */}
+            <div className="flex gap-2 pt-4">
+              {CAROUSEL_SLIDES.map((_, index) => (
+                <button
+                  key={index}
+                  className={`h-2.5 rounded-full transition-all duration-300 ${
+                    index === currentSlide 
+                      ? 'bg-[#1B318E] w-6' 
+                      : 'bg-gray-300 w-2.5 hover:bg-gray-400'
+                  }`}
+                  onClick={() => setCurrentSlide(index)}
+                  aria-label={`Слайд ${index + 1}`}
+                  data-testid={`carousel-dot-${index}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Right side - Login Form */}
-      <div className="login-form-container">
-        <div className="w-full max-w-sm">
-          {/* Logo */}
-          <div className="flex items-center gap-3 mb-10">
-            <div className="logo-icon">
-              <span>В</span>
-            </div>
-            <h1 className="text-2xl font-bold text-[#1B318E] font-heading">
-              Онбординг
-            </h1>
-          </div>
-
-          {/* Login Form */}
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Вход</h2>
-            
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-gray-700">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="h-12 rounded-lg border-gray-200 focus:border-[#1B318E] focus:ring-[#1B318E]/20"
-                  data-testid="email-input"
+        {/* Right side - Login Form */}
+        <div className="p-8 lg:p-12 flex flex-col justify-center">
+          <div className="w-full max-w-[360px] mx-auto">
+            {/* Logo */}
+            <div className="flex items-center gap-3 mb-12">
+              <div className="w-12 h-12 rounded-full bg-[#1B318E] flex items-center justify-center overflow-hidden">
+                <img 
+                  src="/images/hse-logo.svg" 
+                  alt="ВШЭ" 
+                  className="w-full h-full"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.parentElement.innerHTML = '<span class="text-white text-xl font-bold">В</span>';
+                  }}
                 />
               </div>
+              <h1 className="text-2xl font-bold text-[#1B318E] font-heading">
+                Онбординг
+              </h1>
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-gray-700">Пароль</Label>
-                <div className="relative">
+            {/* Login Form */}
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-8 font-heading">Вход</h2>
+              
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-gray-600 text-sm sr-only">Email</Label>
                   <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Пароль"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="h-12 rounded-lg border-gray-200 focus:border-[#1B318E] focus:ring-[#1B318E]/20 pr-12"
-                    data-testid="password-input"
+                    id="email"
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="h-14 rounded-xl border-gray-200 bg-white focus:border-[#1B318E] focus:ring-[#1B318E]/20 text-base px-5"
+                    data-testid="email-input"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    aria-label={showPassword ? "Скрыть пароль" : "Показать пароль"}
-                    data-testid="toggle-password"
-                  >
-                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </button>
                 </div>
-              </div>
 
-              <button
-                type="button"
-                className="text-sm text-[#1B318E] hover:underline"
-                data-testid="forgot-password-link"
-              >
-                Забыли пароль?
-              </button>
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-gray-600 text-sm sr-only">Пароль</Label>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Пароль"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="h-14 rounded-xl border-gray-200 bg-white focus:border-[#1B318E] focus:ring-[#1B318E]/20 text-base px-5 pr-14"
+                      data-testid="password-input"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                      aria-label={showPassword ? "Скрыть пароль" : "Показать пароль"}
+                      data-testid="toggle-password"
+                    >
+                      {showPassword ? <EyeOff size={22} /> : <Eye size={22} />}
+                    </button>
+                  </div>
+                </div>
 
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="w-full h-12 bg-[#1B318E] hover:bg-[#2A42A5] text-white rounded-lg font-medium transition-all duration-200"
-                data-testid="login-button"
-              >
-                {isLoading ? "Вход..." : "Войти"}
-              </Button>
-            </form>
+                <button
+                  type="button"
+                  className="text-sm text-[#1B318E] hover:underline font-medium"
+                  data-testid="forgot-password-link"
+                >
+                  Забыли пароль?
+                </button>
+
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full h-14 bg-[#1B318E] hover:bg-[#152570] text-white rounded-xl font-medium text-base transition-all duration-200 mt-4"
+                  data-testid="login-button"
+                >
+                  {isLoading ? "Вход..." : "Войти"}
+                </Button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
