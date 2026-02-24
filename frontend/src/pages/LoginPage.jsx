@@ -79,14 +79,15 @@ export default function LoginPage({ onLogin }) {
       <div className="w-full max-w-[1000px] bg-white rounded-3xl shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-2 min-h-[600px]">
         
         {/* Left side - Carousel */}
-        <div className="bg-[#E8E0F0] p-8 lg:p-12 flex flex-col justify-between hidden lg:flex">
+        <div className="bg-[#E8E0F0] p-6 lg:p-10 flex flex-col justify-between hidden lg:flex">
           {/* Image container */}
-          <div className="flex-1 flex items-center justify-center mb-6">
-            <div className="w-full max-w-[320px] h-[280px] relative">
+          <div className="flex-1 flex items-center justify-center">
+            <div className="w-full max-w-[380px] h-[340px] relative flex items-center justify-center">
               <img 
+                key={currentSlide}
                 src={CAROUSEL_SLIDES[currentSlide].image}
                 alt={CAROUSEL_SLIDES[currentSlide].title}
-                className="w-full h-full object-contain transition-opacity duration-500"
+                className="max-w-full max-h-full object-contain animate-fade-in"
                 data-testid={`carousel-image-${currentSlide}`}
               />
             </div>
