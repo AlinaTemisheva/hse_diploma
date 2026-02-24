@@ -1,54 +1,64 @@
-<svg viewBox="0 0 400 350" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Meditating person with puzzle pieces -->
+<svg viewBox="0 0 350 350" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Meditating person with puzzle pieces - matching Figma -->
   
-  <!-- Puzzle pieces above head - yellow/lime -->
-  <g transform="translate(150, 30)">
-    <!-- Puzzle piece 1 -->
-    <path d="M20 50 L20 30 Q30 25 30 35 L30 30 L50 30 L50 50 Q40 55 40 45 L40 50 Z" fill="#CCFF00" stroke="#333" stroke-width="1.5"/>
-    <!-- Puzzle piece 2 -->
-    <path d="M55 30 L55 10 Q65 5 65 15 L65 10 L85 10 L85 30 Q75 35 75 25 L75 30 Z" fill="#CCFF00" stroke="#333" stroke-width="1.5"/>
-    <!-- Puzzle piece 3 -->
-    <path d="M40 80 L40 60 Q50 55 50 65 L50 60 L70 60 L70 80 Q60 85 60 75 L60 80 Z" fill="#CCFF00" stroke="#333" stroke-width="1.5"/>
-    <!-- Puzzle piece 4 -->
-    <path d="M70 50 L70 30 Q80 25 80 35 L80 30 L100 30 L100 50 Q90 55 90 45 L90 50 Z" fill="#CCFF00" stroke="#333" stroke-width="1.5"/>
+  <!-- Puzzle pieces above head -->
+  <g transform="translate(100, 15)">
+    <!-- Piece 1 - top left -->
+    <path d="M30 70 L30 45 C35 40 45 40 50 45 L50 40 L75 40 L75 65 C70 60 60 60 55 65 L55 70 Z" 
+          fill="#CCFF00" stroke="#333" stroke-width="2"/>
+    <!-- Piece 2 - top right -->
+    <path d="M80 45 L80 20 C85 15 95 15 100 20 L100 15 L125 15 L125 40 C120 35 110 35 105 40 L105 45 Z" 
+          fill="#CCFF00" stroke="#333" stroke-width="2"/>
+    <!-- Piece 3 - middle -->
+    <path d="M55 95 L55 70 C60 65 70 65 75 70 L75 65 L100 65 L100 90 C95 85 85 85 80 90 L80 95 Z" 
+          fill="#CCFF00" stroke="#333" stroke-width="2"/>
+    <!-- Piece 4 - right -->
+    <path d="M105 70 L105 45 C110 40 120 40 125 45 L125 40 L150 40 L150 65 C145 60 135 60 130 65 L130 70 Z" 
+          fill="#CCFF00" stroke="#333" stroke-width="2"/>
   </g>
   
-  <!-- Motion lines -->
-  <line x1="135" y1="60" x2="125" y2="50" stroke="#333" stroke-width="1.5"/>
-  <line x1="130" y1="75" x2="115" y2="70" stroke="#333" stroke-width="1.5"/>
-  <line x1="275" y1="55" x2="290" y2="45" stroke="#333" stroke-width="1.5"/>
-  <line x1="280" y1="70" x2="295" y2="65" stroke="#333" stroke-width="1.5"/>
+  <!-- Motion/emphasis lines left -->
+  <line x1="85" y1="55" x2="70" y2="45" stroke="#333" stroke-width="2"/>
+  <line x1="80" y1="75" x2="60" y2="70" stroke="#333" stroke-width="2"/>
+  
+  <!-- Motion/emphasis lines right -->
+  <line x1="270" y1="50" x2="285" y2="40" stroke="#333" stroke-width="2"/>
+  <line x1="275" y1="70" x2="292" y2="63" stroke="#333" stroke-width="2"/>
   
   <!-- Head -->
-  <ellipse cx="200" cy="155" rx="45" ry="50" fill="white" stroke="#333" stroke-width="2.5"/>
+  <ellipse cx="175" cy="160" rx="50" ry="55" fill="white" stroke="#333" stroke-width="3"/>
   
   <!-- Hair -->
-  <path d="M165 130 Q160 100 185 95 Q195 90 200 95 L200 110 Q180 115 175 130 Z" fill="#333"/>
-  <path d="M200 95 Q220 85 235 100 Q245 115 235 130 L235 120 Q225 110 210 115 L200 110 Z" fill="#333"/>
+  <path d="M140 130 Q130 95 165 85 Q180 80 190 90 L185 115 Q160 115 150 135 Z" fill="#333"/>
+  <path d="M185 90 Q210 75 230 95 Q245 115 235 140 L230 125 Q220 105 195 105 Z" fill="#333"/>
   
-  <!-- Eyes closed -->
-  <path d="M180 155 Q190 150 200 155" stroke="#333" stroke-width="2" fill="none"/>
-  <path d="M200 155 Q210 150 220 155" stroke="#333" stroke-width="2" fill="none"/>
+  <!-- Eyes - closed curved lines -->
+  <path d="M150 155 Q162 148 175 155" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M175 155 Q188 148 200 155" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
   
   <!-- Smile -->
-  <path d="M185 175 Q200 190 215 175" stroke="#333" stroke-width="2" fill="none"/>
+  <path d="M155 180 Q175 198 195 180" stroke="#333" stroke-width="2.5" fill="none" stroke-linecap="round"/>
   
-  <!-- Body/torso -->
-  <ellipse cx="200" cy="240" rx="35" ry="30" fill="white" stroke="#333" stroke-width="2.5"/>
+  <!-- Body -->
+  <ellipse cx="175" cy="250" rx="38" ry="35" fill="white" stroke="#333" stroke-width="3"/>
   
-  <!-- Arms raised -->
-  <path d="M165 230 Q130 200 120 160" stroke="#333" stroke-width="2.5" fill="none"/>
-  <path d="M235 230 Q270 200 280 160" stroke="#333" stroke-width="2.5" fill="none"/>
+  <!-- Arms raised up -->
+  <path d="M140 240 Q100 200 90 150" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M210 240 Q250 200 260 150" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>
   
   <!-- Hands -->
-  <ellipse cx="120" cy="155" rx="15" ry="12" fill="white" stroke="#333" stroke-width="2"/>
-  <ellipse cx="280" cy="155" rx="15" ry="12" fill="white" stroke="#333" stroke-width="2"/>
+  <ellipse cx="88" cy="145" rx="18" ry="14" fill="white" stroke="#333" stroke-width="2.5"/>
+  <ellipse cx="262" cy="145" rx="18" ry="14" fill="white" stroke="#333" stroke-width="2.5"/>
   
-  <!-- Legs crossed -->
-  <path d="M175 260 Q150 280 160 310 Q170 330 200 320" stroke="#333" stroke-width="2.5" fill="none"/>
-  <path d="M225 260 Q250 280 240 310 Q230 330 200 320" stroke="#333" stroke-width="2.5" fill="none"/>
+  <!-- Fingers suggestion -->
+  <path d="M80 135 Q75 130 78 125" stroke="#333" stroke-width="2" fill="none"/>
+  <path d="M270 135 Q275 130 272 125" stroke="#333" stroke-width="2" fill="none"/>
+  
+  <!-- Crossed legs -->
+  <path d="M150 275 Q115 295 130 330 Q145 350 180 340" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M200 275 Q235 295 220 330 Q205 350 170 340" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>
   
   <!-- Feet -->
-  <ellipse cx="158" cy="315" rx="20" ry="10" fill="white" stroke="#333" stroke-width="2"/>
-  <ellipse cx="242" cy="315" rx="20" ry="10" fill="white" stroke="#333" stroke-width="2"/>
+  <ellipse cx="128" cy="335" rx="22" ry="12" fill="white" stroke="#333" stroke-width="2.5"/>
+  <ellipse cx="222" cy="335" rx="22" ry="12" fill="white" stroke="#333" stroke-width="2.5"/>
 </svg>
