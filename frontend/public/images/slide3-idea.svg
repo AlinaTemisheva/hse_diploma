@@ -1,0 +1,61 @@
+<svg viewBox="0 0 400 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Person with lightbulb idea -->
+  
+  <!-- Lightbulb -->
+  <ellipse cx="180" cy="45" rx="25" ry="30" fill="#E8FF00" stroke="#333" stroke-width="2"/>
+  <rect x="170" y="70" width="20" height="15" fill="#E8FF00" stroke="#333" stroke-width="2"/>
+  <line x1="175" y1="72" x2="175" y2="82" stroke="#333" stroke-width="1.5"/>
+  <line x1="180" y1="72" x2="180" y2="82" stroke="#333" stroke-width="1.5"/>
+  <line x1="185" y1="72" x2="185" y2="82" stroke="#333" stroke-width="1.5"/>
+  
+  <!-- Light rays -->
+  <line x1="180" y1="10" x2="180" y2="0" stroke="#333" stroke-width="1.5"/>
+  <line x1="150" y1="25" x2="140" y2="15" stroke="#333" stroke-width="1.5"/>
+  <line x1="210" y1="25" x2="220" y2="15" stroke="#333" stroke-width="1.5"/>
+  <line x1="145" y1="50" x2="130" y2="50" stroke="#333" stroke-width="1.5"/>
+  <line x1="215" y1="50" x2="230" y2="50" stroke="#333" stroke-width="1.5"/>
+  
+  <!-- Arm pointing up -->
+  <path d="M185 135 Q175 110 175 90" stroke="#333" stroke-width="2.5" fill="none"/>
+  <circle cx="178" cy="88" r="8" fill="white" stroke="#333" stroke-width="2"/>
+  
+  <!-- Head -->
+  <ellipse cx="220" cy="145" rx="50" ry="55" fill="white" stroke="#333" stroke-width="2.5"/>
+  
+  <!-- Hair -->
+  <path d="M190 110 Q200 80 250 90 Q280 100 275 140 L270 130 Q265 100 235 95 Q210 95 200 115 Z" fill="#333"/>
+  
+  <!-- Face - eye open, mouth open happy -->
+  <circle cx="205" cy="140" r="6" fill="#333"/>
+  <ellipse cx="190" cy="170" rx="20" ry="15" fill="white" stroke="#333" stroke-width="2"/>
+  
+  <!-- Tongue/inside mouth -->
+  <ellipse cx="190" cy="175" rx="10" ry="8" fill="#FFB6C1"/>
+  
+  <!-- Body -->
+  <path d="M200 200 L180 330 L220 330 L250 200" fill="none" stroke="#333" stroke-width="2.5"/>
+  
+  <!-- Pants with pattern -->
+  <path d="M185 230 L170 340" stroke="#333" stroke-width="2.5" fill="none"/>
+  <path d="M245 230 L260 340" stroke="#333" stroke-width="2.5" fill="none"/>
+  
+  <!-- Pants fill with dots -->
+  <rect x="175" y="220" width="80" height="120" rx="10" fill="#CCFF00" stroke="#333" stroke-width="2"/>
+  
+  <!-- Dots pattern on pants -->
+  <circle cx="195" cy="250" r="5" fill="#B8E600"/>
+  <circle cx="220" cy="240" r="6" fill="#B8E600"/>
+  <circle cx="235" cy="265" r="5" fill="#B8E600"/>
+  <circle cx="200" cy="285" r="6" fill="#B8E600"/>
+  <circle cx="225" cy="295" r="5" fill="#B8E600"/>
+  <circle cx="190" cy="310" r="5" fill="#B8E600"/>
+  <circle cx="215" cy="320" r="6" fill="#B8E600"/>
+  <circle cx="240" cy="305" r="4" fill="#B8E600"/>
+  
+  <!-- Feet -->
+  <ellipse cx="170" cy="350" rx="25" ry="12" fill="#CCFF00" stroke="#333" stroke-width="2"/>
+  <ellipse cx="260" cy="350" rx="25" ry="12" fill="#CCFF00" stroke="#333" stroke-width="2"/>
+  
+  <!-- Other arm -->
+  <path d="M260 180 Q290 200 285 240" stroke="#333" stroke-width="2.5" fill="none"/>
+</svg>

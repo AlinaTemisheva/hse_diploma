@@ -1,0 +1,56 @@
+<svg viewBox="0 0 400 350" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Flying whale/person with flag -->
+  <!-- Cloud left -->
+  <ellipse cx="100" cy="280" rx="35" ry="15" fill="white"/>
+  <ellipse cx="85" cy="275" rx="20" ry="12" fill="white"/>
+  
+  <!-- Cloud right small -->
+  <ellipse cx="300" cy="120" rx="25" ry="10" fill="#E8E0F0"/>
+  <ellipse cx="290" cy="116" rx="15" ry="8" fill="#E8E0F0"/>
+  
+  <!-- Smoke/breath lines -->
+  <path d="M320 100 Q330 90 325 105" stroke="#333" stroke-width="2" fill="none"/>
+  <path d="M330 95 Q340 85 335 100" stroke="#333" stroke-width="2" fill="none"/>
+  
+  <!-- Bubbles -->
+  <circle cx="280" cy="150" r="8" fill="none" stroke="#333" stroke-width="1.5"/>
+  <circle cx="260" cy="175" r="5" fill="none" stroke="#333" stroke-width="1.5"/>
+  <circle cx="295" cy="170" r="6" fill="none" stroke="#333" stroke-width="1.5"/>
+  
+  <!-- Flag pole -->
+  <line x1="140" y1="100" x2="180" y2="180" stroke="#333" stroke-width="3"/>
+  
+  <!-- Flag -->
+  <path d="M140 100 L100 70 L140 50 L140 100" fill="#E8FF00" stroke="#333" stroke-width="2"/>
+  
+  <!-- Body (whale-like) -->
+  <ellipse cx="230" cy="200" rx="80" ry="45" fill="white" stroke="#333" stroke-width="2.5"/>
+  
+  <!-- Tail/fins stripes -->
+  <path d="M175 230 Q160 260 140 280" stroke="#333" stroke-width="2.5" fill="none"/>
+  <path d="M185 235 Q170 260 155 275" stroke="#333" stroke-width="2.5" fill="none"/>
+  <path d="M195 238 Q185 255 175 268" stroke="#333" stroke-width="2.5" fill="none"/>
+  
+  <!-- Curly hair -->
+  <ellipse cx="270" cy="175" rx="25" ry="20" fill="#333"/>
+  <circle cx="260" cy="165" r="8" fill="#333"/>
+  <circle cx="280" cy="160" r="10" fill="#333"/>
+  <circle cx="290" cy="170" r="7" fill="#333"/>
+  <circle cx="255" cy="180" r="6" fill="#333"/>
+  
+  <!-- Face area (glasses) -->
+  <circle cx="240" cy="190" r="12" fill="none" stroke="#333" stroke-width="2"/>
+  <circle cx="238" cy="190" r="4" fill="#333"/>
+  
+  <!-- Glasses bridge -->
+  <line x1="252" y1="190" x2="265" y2="185" stroke="#333" stroke-width="2"/>
+  
+  <!-- Arm pointing up -->
+  <path d="M200 175 Q180 140 170 120" stroke="#333" stroke-width="2.5" fill="none"/>
+  
+  <!-- Hand holding flag -->
+  <circle cx="175" cy="175" r="8" fill="white" stroke="#333" stroke-width="2"/>
+  
+  <!-- Smile marks -->
+  <path d="M290 200 Q305 195 315 205" stroke="#333" stroke-width="2" fill="none"/>
+</svg>
