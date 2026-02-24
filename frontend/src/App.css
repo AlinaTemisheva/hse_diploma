@@ -348,9 +348,6 @@
 .tab-trigger:hover:not([data-state="active"]) {
     background-color: rgba(255, 255, 255, 0.5);
 }
-    color: #1B318E;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
 
 /* Animations */
 @keyframes slideIn {
