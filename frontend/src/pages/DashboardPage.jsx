@@ -294,6 +294,7 @@ export default function DashboardPage({ user, onLogout }) {
             </div>
           </TabsContent>
         </Tabs>
+        </div>
       </main>
     </div>
   );
