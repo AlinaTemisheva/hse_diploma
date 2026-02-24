@@ -309,18 +309,18 @@
 
 /* Tabs custom styles */
 .tabs-container {
-    background-color: #F3F4F6;
+    background-color: #EBEEF2;
     border-radius: 12px;
     padding: 4px;
     margin-bottom: 1.5rem;
     display: flex;
-    gap: 4px;
+    width: 100%;
 }
 
 .tab-trigger {
     flex: 1;
-    padding: 12px 8px;
-    border-radius: 8px;
+    padding: 14px 12px;
+    border-radius: 10px;
     font-weight: 500;
     font-size: 14px;
     transition: all 0.2s ease;
@@ -330,23 +330,30 @@
     white-space: nowrap;
     border: none;
     cursor: pointer;
+    min-width: 0;
 }
 
 @media (max-width: 640px) {
+    .tabs-container {
+        padding: 3px;
+    }
     .tab-trigger {
-        font-size: 12px;
-        padding: 10px 4px;
+        font-size: 11px;
+        padding: 10px 6px;
+        border-radius: 8px;
     }
 }
 
 .tab-trigger[data-state="active"] {
     background-color: white;
     color: #1B318E;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .tab-trigger:hover:not([data-state="active"]) {
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(255, 255, 255, 0.4);
+    color: #374151;
 }
 
 /* Animations */
