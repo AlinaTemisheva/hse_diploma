@@ -800,13 +800,10 @@ export default function AdminDashboardPage({ user, onLogout }) {
     if (sheetType === 'task') {
       return (
         <>
-          <SheetHeader className="flex-row items-center justify-between space-y-0 pb-6">
+          <SheetHeader className="pb-6">
             <SheetTitle className="text-xl font-semibold">
               {isEditMode ? "Редактирование задачи" : "Добавление задачи"}
             </SheetTitle>
-            <button onClick={closeSheet} className="text-gray-400 hover:text-gray-600">
-              <X className="w-5 h-5" />
-            </button>
           </SheetHeader>
           
           <div className="flex-1 space-y-6 overflow-y-auto">
