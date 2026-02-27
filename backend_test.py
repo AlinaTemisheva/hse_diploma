@@ -356,11 +356,11 @@ class OnboardingAPITester:
             data=duplicate_data
         )
         
-        if success:  # Should fail, so success means error
-            print("❌ Duplicate email was allowed (should be rejected)")
+        if success:  # 400 status means success for this test (we expect it to fail)
+            print("   ✅ Duplicate email properly rejected")
+        else:
+            print("❌ Duplicate email validation not working")
             return False
-        
-        print("   ✅ Duplicate email properly rejected")
         
         # 8. Test invalid teacher ID
         success, _ = self.run_test(
