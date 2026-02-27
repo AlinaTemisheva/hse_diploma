@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { 
   Globe, 
@@ -14,7 +15,9 @@ import {
   Check,
   Clock,
   LogOut,
-  ExternalLink
+  ExternalLink,
+  ChevronRight,
+  X
 } from "lucide-react";
 import axios from "axios";
 
