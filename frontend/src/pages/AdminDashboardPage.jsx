@@ -1390,6 +1390,103 @@ export default function AdminDashboardPage({ user, onLogout }) {
       );
     }
 
+    if (sheetType === 'module') {
+      return (
+        <>
+          <SheetHeader className="pb-6">
+            <SheetTitle className="text-xl font-semibold">
+              {isEditMode ? "Редактирование модуля" : "Добавление модуля"}
+            </SheetTitle>
+          </SheetHeader>
+          
+          <div className="flex-1 space-y-6 overflow-y-auto">
+            {/* Module Title */}
+            <div className="space-y-2">
+              <Label className="text-base font-medium">Название модуля *</Label>
+              <Input
+                value={moduleForm.title}
+                onChange={(e) => setModuleForm({ ...moduleForm, title: e.target.value })}
+                className="h-12 rounded-lg border-gray-200"
+                placeholder="Введите название модуля"
+                data-testid="module-title-input"
+              />
+            </div>
+
+            {/* Module Description */}
+            <div className="space-y-2">
+              <Label className="text-base font-medium">Описание</Label>
+              <Textarea
+                value={moduleForm.description}
+                onChange={(e) => setModuleForm({ ...moduleForm, description: e.target.value })}
+                className="min-h-[120px] rounded-lg border-gray-200 resize-none"
+                placeholder="Краткое описание модуля"
+                data-testid="module-description-input"
+              />
+            </div>
+
+            {/* Order Number */}
+            <div className="space-y-2">
+              <Label className="text-base font-medium">Порядковый номер</Label>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setModuleForm({ ...moduleForm, order: Math.max(1, moduleForm.order - 1) })}
+                  className="w-12 h-12 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                  data-testid="module-order-minus-btn"
+                >
+                  <Minus className="w-5 h-5 text-gray-600" />
+                </button>
+                <Input
+                  type="number"
+                  value={moduleForm.order}
+                  onChange={(e) => setModuleForm({ ...moduleForm, order: Math.max(1, parseInt(e.target.value) || 1) })}
+                  className="h-12 w-24 text-center rounded-lg border-gray-200"
+                  min="1"
+                  data-testid="module-order-input"
+                />
+                <button
+                  type="button"
+                  onClick={() => setModuleForm({ ...moduleForm, order: moduleForm.order + 1 })}
+                  className="w-12 h-12 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                  data-testid="module-order-plus-btn"
+                >
+                  <Plus className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <SheetFooter className="flex-col gap-3 mt-auto pt-6">
+            <Button
+              onClick={handleModuleSubmit}
+              disabled={isSubmitting}
+              className="w-full h-12 bg-[#1B318E] hover:bg-[#152570] text-white rounded-lg"
+              data-testid="save-module-btn"
+            >
+              {isSubmitting ? "Сохранение..." : "Сохранить"}
+            </Button>
+            
+            {isEditMode && (
+              <Button 
+                variant="outline" 
+                onClick={handleModuleDelete}
+                disabled={isSubmitting}
+                className="w-full h-12 rounded-lg border-red-200 text-red-600 hover:bg-red-50"
+                data-testid="delete-module-btn"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Удалить модуль
+              </Button>
+            )}
+            
+            <Button variant="outline" onClick={closeSheet} className="w-full h-12 rounded-lg border-gray-200">
+              Закрыть
+            </Button>
+          </SheetFooter>
+        </>
+      );
+    }
+
     return null;
   };
 
