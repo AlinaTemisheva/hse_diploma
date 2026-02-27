@@ -370,11 +370,11 @@ class OnboardingAPITester:
             404
         )
         
-        if success:  # Should fail with 404
-            print("❌ Invalid teacher ID should return 404")
+        if success:  # 404 status means success for this test (we expect it to fail)
+            print("   ✅ Invalid teacher ID properly returns 404")
+        else:
+            print("❌ Invalid teacher ID handling not working")
             return False
-        
-        print("   ✅ Invalid teacher ID properly returns 404")
         
         print("\n✅ All Teacher CRUD operations passed!")
         return True
