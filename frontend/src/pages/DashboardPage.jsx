@@ -67,12 +67,13 @@ export default function DashboardPage({ user, onLogout }) {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const [tasksRes, coursesRes, docsRes, servicesRes, statsRes] = await Promise.all([
+      const [tasksRes, coursesRes, docsRes, servicesRes, statsRes, modulesRes] = await Promise.all([
         axios.get(`${API}/tasks`),
         axios.get(`${API}/courses`),
         axios.get(`${API}/documents`),
         axios.get(`${API}/services`),
-        axios.get(`${API}/user/stats`)
+        axios.get(`${API}/user/stats`),
+        axios.get(`${API}/modules`)
       ]);
       
       setTasks(tasksRes.data);
@@ -80,12 +81,38 @@ export default function DashboardPage({ user, onLogout }) {
       setDocuments(docsRes.data);
       setServices(servicesRes.data);
       setStats(statsRes.data);
+      setModules(modulesRes.data);
     } catch (error) {
       toast.error("Ошибка загрузки данных");
       console.error("Error fetching data:", error);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const openModuleLessons = async (module) => {
+    setSelectedModule(module);
+    setSelectedLesson(null);
+    try {
+      const response = await axios.get(`${API}/modules/${module.id}/lessons`);
+      setModuleLessons(response.data);
+      setIsLessonModalOpen(true);
+    } catch (error) {
+      toast.error("Ошибка загрузки уроков");
+    }
+  };
+
+  const openLesson = async (lesson) => {
+    try {
+      const response = await axios.get(`${API}/lessons/${lesson.id}`);
+      setSelectedLesson(response.data);
+    } catch (error) {
+      toast.error("Ошибка загрузки урока");
+    }
+  };
+
+  const goBackToLessons = () => {
+    setSelectedLesson(null);
   };
 
   const handleTaskToggle = async (taskId, currentState) => {
