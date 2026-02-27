@@ -489,12 +489,31 @@ export default function DashboardPage({ user, onLogout }) {
                         data-testid={`lesson-item-${lesson.id}`}
                       >
                         <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-medium">
-                            {lesson.order}
+                          {/* Progress indicator */}
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                            lesson.progress_status === "completed" 
+                              ? "bg-green-100" 
+                              : lesson.progress_status === "in_progress"
+                                ? "bg-yellow-100"
+                                : "bg-purple-100"
+                          }`}>
+                            {lesson.progress_status === "completed" ? (
+                              <CheckCircle2 className="w-5 h-5 text-green-600" />
+                            ) : lesson.progress_status === "in_progress" ? (
+                              <Circle className="w-5 h-5 text-yellow-600" />
+                            ) : (
+                              <span className="text-purple-600 font-medium">{lesson.order}</span>
+                            )}
                           </div>
                           <div>
                             <h4 className="font-medium text-gray-900">{lesson.title}</h4>
                             <p className="text-sm text-gray-500">{lesson.description}</p>
+                            {lesson.progress_status === "completed" && (
+                              <span className="text-xs text-green-600 font-medium">Пройден</span>
+                            )}
+                            {lesson.progress_status === "in_progress" && (
+                              <span className="text-xs text-yellow-600 font-medium">В процессе</span>
+                            )}
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
