@@ -75,11 +75,11 @@ export default function DashboardPage({ user, userId, onLogout }) {
     setIsLoading(true);
     try {
       const [tasksRes, coursesRes, docsRes, servicesRes, statsRes, modulesRes] = await Promise.all([
-        axios.get(`${API}/tasks`),
+        axios.get(`${API}/tasks?user_id=${currentUserId}`),
         axios.get(`${API}/courses`),
         axios.get(`${API}/documents`),
         axios.get(`${API}/services`),
-        axios.get(`${API}/user/stats`),
+        axios.get(`${API}/user/stats?user_id=${currentUserId}`),
         axios.get(`${API}/modules`)
       ]);
       
