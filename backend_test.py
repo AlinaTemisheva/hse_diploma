@@ -406,7 +406,6 @@ def main():
     admin_tests = [
         tester.test_admin_login_success,
         tester.test_get_admin_teachers,
-        tester.test_create_teacher,
         tester.test_get_admin_tasks,
         tester.test_get_admin_courses,
         tester.test_get_admin_documents,
@@ -415,6 +414,10 @@ def main():
     
     for test in admin_tests:
         test()
+    
+    # Run comprehensive teacher CRUD tests
+    print("\n🔄 Testing Teacher CRUD Operations")
+    tester.test_teacher_crud_operations()
     
     print(f"\n📊 Final Results: {tester.tests_passed}/{tester.tests_run} tests passed")
     print("=" * 60)
