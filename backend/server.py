@@ -9,6 +9,8 @@ from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
+import secrets
+import string
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -34,6 +36,7 @@ class LoginResponse(BaseModel):
     success: bool
     message: str
     user: Optional[dict] = None
+    role: Optional[str] = None
 
 class Task(BaseModel):
     id: str
@@ -66,14 +69,71 @@ class Service(BaseModel):
 class TaskToggleRequest(BaseModel):
     completed: bool
 
+# ============ Admin Models ============
+
+class Teacher(BaseModel):
+    id: str
+    name: str
+    email: str
+    status: str  # registered, in_progress, completed
+    avatar_url: Optional[str] = None
+    password: Optional[str] = None
+    created_at: Optional[str] = None
+
+class TeacherCreate(BaseModel):
+    name: str
+    email: str
+
+class AdminTask(BaseModel):
+    id: str
+    title: str
+    description: str
+    order: int
+
+class AdminCourse(BaseModel):
+    id: str
+    module_number: int
+    title: str
+    description: str
+    duration: str
+
+class AdminDocument(BaseModel):
+    id: str
+    title: str
+    description: str
+    file_type: str
+
 # ============ Mock Data ============
 
+# Regular user
 MOCK_USER = {
     "email": "test@test.ru",
     "password": "test",
-    "name": "Иван Семёнов",
-    "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=Ivan"
+    "name": "Тестов Тест Тестович",
+    "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=Test",
+    "role": "teacher"
 }
+
+# Admin user
+MOCK_ADMIN = {
+    "email": "test_admin@test.ru",
+    "password": "test_admin",
+    "name": "admin",
+    "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=Admin",
+    "role": "admin"
+}
+
+# Teachers list (including the regular user as first teacher)
+teachers_db = [
+    Teacher(
+        id="1",
+        name="Тестов Тест Тестович",
+        email="test@test.ru",
+        status="registered",
+        avatar_url="https://api.dicebear.com/7.x/avataaars/svg?seed=Test",
+        created_at="2024-01-15"
+    )
+]
 
 MOCK_TASKS = [
     Task(id="1", title="Заведите страницу преподавателя", description="Что, зачем и где сделать", completed=False),
@@ -151,6 +211,13 @@ MOCK_SERVICES = [
 # ============ In-memory state for tasks ============
 task_states = {task.id: task.completed for task in MOCK_TASKS}
 
+# ============ Helper Functions ============
+
+def generate_password(length=10):
+    """Generate a random password"""
+    alphabet = string.ascii_letters + string.digits
+    return ''.join(secrets.choice(alphabet) for _ in range(length))
+
 # ============ Routes ============
 
 @api_router.get("/")
@@ -159,6 +226,20 @@ async def root():
 
 @api_router.post("/auth/login", response_model=LoginResponse)
 async def login(request: LoginRequest):
+    # Check admin login
+    if request.email == MOCK_ADMIN["email"] and request.password == MOCK_ADMIN["password"]:
+        return LoginResponse(
+            success=True,
+            message="Успешный вход",
+            user={
+                "email": MOCK_ADMIN["email"],
+                "name": MOCK_ADMIN["name"],
+                "avatar_url": MOCK_ADMIN["avatar_url"]
+            },
+            role="admin"
+        )
+    
+    # Check regular user login
     if request.email == MOCK_USER["email"] and request.password == MOCK_USER["password"]:
         return LoginResponse(
             success=True,
@@ -167,8 +248,24 @@ async def login(request: LoginRequest):
                 "email": MOCK_USER["email"],
                 "name": MOCK_USER["name"],
                 "avatar_url": MOCK_USER["avatar_url"]
-            }
+            },
+            role="teacher"
         )
+    
+    # Check if teacher exists in teachers_db
+    for teacher in teachers_db:
+        if teacher.email == request.email and teacher.password == request.password:
+            return LoginResponse(
+                success=True,
+                message="Успешный вход",
+                user={
+                    "email": teacher.email,
+                    "name": teacher.name,
+                    "avatar_url": teacher.avatar_url
+                },
+                role="teacher"
+            )
+    
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Неверный email или пароль"
@@ -216,6 +313,86 @@ async def get_user_stats():
         "tasks_total": total_tasks,
         "courses_completed": completed_courses,
         "courses_total": total_courses
+    }
+
+# ============ Admin Routes ============
+
+@api_router.get("/admin/teachers", response_model=List[Teacher])
+async def get_teachers():
+    return teachers_db
+
+@api_router.post("/admin/teachers", response_model=Teacher)
+async def create_teacher(teacher_data: TeacherCreate):
+    # Check if email already exists
+    for teacher in teachers_db:
+        if teacher.email == teacher_data.email:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Преподаватель с таким email уже существует"
+            )
+    
+    # Generate password
+    password = generate_password()
+    
+    # Create new teacher
+    new_teacher = Teacher(
+        id=str(uuid.uuid4()),
+        name=teacher_data.name,
+        email=teacher_data.email,
+        status="in_progress",
+        avatar_url=f"https://api.dicebear.com/7.x/avataaars/svg?seed={teacher_data.name.replace(' ', '')}",
+        password=password,
+        created_at=datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    )
+    
+    teachers_db.append(new_teacher)
+    
+    # Return teacher without password in response (but store it)
+    return Teacher(
+        id=new_teacher.id,
+        name=new_teacher.name,
+        email=new_teacher.email,
+        status=new_teacher.status,
+        avatar_url=new_teacher.avatar_url,
+        created_at=new_teacher.created_at
+    )
+
+@api_router.delete("/admin/teachers/{teacher_id}")
+async def delete_teacher(teacher_id: str):
+    global teachers_db
+    for i, teacher in enumerate(teachers_db):
+        if teacher.id == teacher_id:
+            teachers_db.pop(i)
+            return {"success": True, "message": "Преподаватель удален"}
+    raise HTTPException(status_code=404, detail="Преподаватель не найден")
+
+@api_router.put("/admin/teachers/{teacher_id}/status")
+async def update_teacher_status(teacher_id: str, status: str):
+    for teacher in teachers_db:
+        if teacher.id == teacher_id:
+            teacher.status = status
+            return {"success": True, "teacher_id": teacher_id, "status": status}
+    raise HTTPException(status_code=404, detail="Преподаватель не найден")
+
+@api_router.get("/admin/tasks", response_model=List[Task])
+async def get_admin_tasks():
+    return MOCK_TASKS
+
+@api_router.get("/admin/courses", response_model=List[Course])
+async def get_admin_courses():
+    return MOCK_COURSES
+
+@api_router.get("/admin/documents", response_model=List[Document])
+async def get_admin_documents():
+    return MOCK_DOCUMENTS
+
+@api_router.get("/admin/stats")
+async def get_admin_stats():
+    return {
+        "teachers_count": len(teachers_db),
+        "tasks_count": len(MOCK_TASKS),
+        "courses_count": len(MOCK_COURSES),
+        "documents_count": len(MOCK_DOCUMENTS)
     }
 
 # Include the router in the main app
