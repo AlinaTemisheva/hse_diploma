@@ -382,6 +382,90 @@ export default function DashboardPage({ user, onLogout }) {
         </Tabs>
         </div>
       </main>
+
+      {/* Lesson Modal */}
+      <Dialog open={isLessonModalOpen} onOpenChange={setIsLessonModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden flex flex-col p-0">
+          {selectedLesson ? (
+            // Lesson Content View
+            <>
+              <DialogHeader className="p-6 pb-4 border-b border-gray-100">
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={goBackToLessons}
+                    className="p-1 rounded-lg hover:bg-gray-100 transition-colors"
+                    data-testid="back-to-lessons-btn"
+                  >
+                    <ChevronRight className="w-5 h-5 text-gray-600 rotate-180" />
+                  </button>
+                  <DialogTitle className="text-xl font-semibold">{selectedLesson.title}</DialogTitle>
+                </div>
+                <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    {selectedLesson.duration_minutes} мин
+                  </span>
+                </div>
+              </DialogHeader>
+              <div className="flex-1 overflow-y-auto p-6">
+                <div 
+                  className="prose prose-sm max-w-none"
+                  dangerouslySetInnerHTML={{ __html: selectedLesson.content }}
+                  data-testid="lesson-content"
+                />
+              </div>
+            </>
+          ) : (
+            // Lessons List View
+            <>
+              <DialogHeader className="p-6 pb-4 border-b border-gray-100">
+                <DialogTitle className="text-xl font-semibold">
+                  {selectedModule && `Модуль ${selectedModule.order}. ${selectedModule.title}`}
+                </DialogTitle>
+                {selectedModule && (
+                  <p className="text-sm text-gray-500 mt-1">{selectedModule.description}</p>
+                )}
+              </DialogHeader>
+              <div className="flex-1 overflow-y-auto">
+                {moduleLessons.length > 0 ? (
+                  <div className="divide-y divide-gray-100">
+                    {moduleLessons.map((lesson) => (
+                      <div
+                        key={lesson.id}
+                        className="p-4 flex items-center justify-between hover:bg-gray-50 cursor-pointer transition-colors"
+                        onClick={() => openLesson(lesson)}
+                        data-testid={`lesson-item-${lesson.id}`}
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-medium">
+                            {lesson.order}
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-gray-900">{lesson.title}</h4>
+                            <p className="text-sm text-gray-500">{lesson.description}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm text-gray-500 flex items-center gap-1">
+                            <Clock className="w-4 h-4" />
+                            {lesson.duration_minutes} мин
+                          </span>
+                          <ChevronRight className="w-5 h-5 text-gray-400" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-8 text-center text-gray-500">
+                    <BookOpen className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+                    <p>В этом модуле пока нет уроков</p>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
