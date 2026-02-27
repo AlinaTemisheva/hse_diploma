@@ -293,11 +293,12 @@ async def login(request: LoginRequest):
 @api_router.get("/tasks", response_model=List[Task])
 async def get_tasks():
     tasks = []
-    for task in MOCK_TASKS:
+    for task in sorted(tasks_db, key=lambda x: x.order):
         tasks.append(Task(
             id=task.id,
             title=task.title,
             description=task.description,
+            order=task.order,
             completed=task_states.get(task.id, task.completed)
         ))
     return tasks
@@ -324,7 +325,7 @@ async def get_services():
 @api_router.get("/user/stats")
 async def get_user_stats():
     completed_tasks = sum(1 for completed in task_states.values() if completed)
-    total_tasks = len(MOCK_TASKS)
+    total_tasks = len(tasks_db)
     completed_courses = sum(1 for course in MOCK_COURSES if course.completed)
     total_courses = len(MOCK_COURSES)
     return {
