@@ -215,13 +215,14 @@ class OnboardingAPITester:
         return False
 
 def main():
-    print("🚀 Starting Onboarding API Tests")
-    print("=" * 50)
+    print("🚀 Starting Onboarding API Tests (including Admin Panel)")
+    print("=" * 60)
     
     tester = OnboardingAPITester()
     
-    # Test all endpoints
-    tests = [
+    # Test regular endpoints first
+    print("\n📱 Testing Regular User Endpoints")
+    regular_tests = [
         tester.test_root_endpoint,
         tester.test_login_success,
         tester.test_login_failure,
@@ -233,11 +234,25 @@ def main():
         tester.test_task_toggle
     ]
     
-    for test in tests:
+    for test in regular_tests:
+        test()
+    
+    print("\n👨‍💼 Testing Admin Endpoints")
+    admin_tests = [
+        tester.test_admin_login_success,
+        tester.test_get_admin_teachers,
+        tester.test_create_teacher,
+        tester.test_get_admin_tasks,
+        tester.test_get_admin_courses,
+        tester.test_get_admin_documents,
+        tester.test_get_admin_stats
+    ]
+    
+    for test in admin_tests:
         test()
     
     print(f"\n📊 Final Results: {tester.tests_passed}/{tester.tests_run} tests passed")
-    print("=" * 50)
+    print("=" * 60)
     
     if tester.tests_passed == tester.tests_run:
         print("🎉 All API tests passed!")
