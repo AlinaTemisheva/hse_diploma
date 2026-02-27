@@ -1554,6 +1554,165 @@ export default function AdminDashboardPage({ user, onLogout }) {
           {renderSheetContent()}
         </SheetContent>
       </Sheet>
+
+      {/* Lesson Modal */}
+      <Dialog open={isLessonModalOpen} onOpenChange={setIsLessonModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold">
+              {isLessonEditMode ? "Редактирование урока" : "Добавление урока"}
+              {selectedModuleForLesson && (
+                <span className="text-gray-500 font-normal text-base ml-2">
+                  — {selectedModuleForLesson.title}
+                </span>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="flex-1 overflow-hidden flex flex-col">
+            <Tabs value={lessonModalTab} onValueChange={setLessonModalTab} className="flex-1 flex flex-col">
+              <TabsList className="w-full grid grid-cols-2 mb-4">
+                <TabsTrigger value="description" data-testid="lesson-tab-description">Описание</TabsTrigger>
+                <TabsTrigger value="content" data-testid="lesson-tab-content">Содержание</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="description" className="flex-1 space-y-4 overflow-y-auto">
+                {/* Lesson Title */}
+                <div className="space-y-2">
+                  <Label className="text-base font-medium">Название урока *</Label>
+                  <Input
+                    value={lessonForm.title}
+                    onChange={(e) => setLessonForm({ ...lessonForm, title: e.target.value })}
+                    className="h-12 rounded-lg border-gray-200"
+                    placeholder="Введите название урока"
+                    data-testid="lesson-title-input"
+                  />
+                </div>
+
+                {/* Lesson Description */}
+                <div className="space-y-2">
+                  <Label className="text-base font-medium">Краткое описание</Label>
+                  <Textarea
+                    value={lessonForm.description}
+                    onChange={(e) => setLessonForm({ ...lessonForm, description: e.target.value })}
+                    className="min-h-[100px] rounded-lg border-gray-200 resize-none"
+                    placeholder="Краткое описание урока"
+                    data-testid="lesson-description-input"
+                  />
+                </div>
+
+                {/* Duration */}
+                <div className="space-y-2">
+                  <Label className="text-base font-medium">Длительность (минут)</Label>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setLessonForm({ ...lessonForm, duration_minutes: Math.max(5, lessonForm.duration_minutes - 5) })}
+                      className="w-12 h-12 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                      data-testid="lesson-duration-minus-btn"
+                    >
+                      <Minus className="w-5 h-5 text-gray-600" />
+                    </button>
+                    <Input
+                      type="number"
+                      value={lessonForm.duration_minutes}
+                      onChange={(e) => setLessonForm({ ...lessonForm, duration_minutes: Math.max(5, parseInt(e.target.value) || 5) })}
+                      className="h-12 w-24 text-center rounded-lg border-gray-200"
+                      min="5"
+                      data-testid="lesson-duration-input"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setLessonForm({ ...lessonForm, duration_minutes: lessonForm.duration_minutes + 5 })}
+                      className="w-12 h-12 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                      data-testid="lesson-duration-plus-btn"
+                    >
+                      <Plus className="w-5 h-5 text-gray-600" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Order Number */}
+                <div className="space-y-2">
+                  <Label className="text-base font-medium">Порядковый номер</Label>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setLessonForm({ ...lessonForm, order: Math.max(1, lessonForm.order - 1) })}
+                      className="w-12 h-12 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                      data-testid="lesson-order-minus-btn"
+                    >
+                      <Minus className="w-5 h-5 text-gray-600" />
+                    </button>
+                    <Input
+                      type="number"
+                      value={lessonForm.order}
+                      onChange={(e) => setLessonForm({ ...lessonForm, order: Math.max(1, parseInt(e.target.value) || 1) })}
+                      className="h-12 w-24 text-center rounded-lg border-gray-200"
+                      min="1"
+                      data-testid="lesson-order-input"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setLessonForm({ ...lessonForm, order: lessonForm.order + 1 })}
+                      className="w-12 h-12 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                      data-testid="lesson-order-plus-btn"
+                    >
+                      <Plus className="w-5 h-5 text-gray-600" />
+                    </button>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="content" className="flex-1 overflow-hidden">
+                <div className="h-[400px]">
+                  <ReactQuill
+                    theme="snow"
+                    value={lessonForm.content}
+                    onChange={(content) => setLessonForm({ ...lessonForm, content })}
+                    modules={quillModules}
+                    formats={quillFormats}
+                    className="h-[350px]"
+                    placeholder="Введите содержание урока..."
+                    data-testid="lesson-content-editor"
+                  />
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+
+          <DialogFooter className="flex-col sm:flex-row gap-3 mt-4">
+            {isLessonEditMode && (
+              <Button 
+                variant="outline" 
+                onClick={handleLessonDelete}
+                disabled={isSubmitting}
+                className="w-full sm:w-auto rounded-lg border-red-200 text-red-600 hover:bg-red-50"
+                data-testid="delete-lesson-btn"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Удалить
+              </Button>
+            )}
+            <div className="flex-1" />
+            <Button 
+              variant="outline" 
+              onClick={() => setIsLessonModalOpen(false)} 
+              className="w-full sm:w-auto rounded-lg border-gray-200"
+            >
+              Отмена
+            </Button>
+            <Button
+              onClick={handleLessonSubmit}
+              disabled={isSubmitting}
+              className="w-full sm:w-auto bg-[#1B318E] hover:bg-[#152570] text-white rounded-lg"
+              data-testid="save-lesson-btn"
+            >
+              {isSubmitting ? "Сохранение..." : "Сохранить"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
