@@ -82,7 +82,7 @@ export default function AdminDashboardPage({ user, onLogout }) {
   
   // Sheet states
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [sheetType, setSheetType] = useState(null); // 'teacher' | 'task'
+  const [sheetType, setSheetType] = useState(null); // 'teacher' | 'task' | 'document'
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   
@@ -102,12 +102,22 @@ export default function AdminDashboardPage({ user, onLogout }) {
     description: "",
     order: 1
   });
+
+  // Document form states
+  const [docForm, setDocForm] = useState({
+    title: "",
+    description: "",
+    file_type: "doc",
+    download_url: "",
+    order: 1
+  });
   
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Pagination for tasks
+  // Pagination
   const [taskPage, setTaskPage] = useState(1);
-  const tasksPerPage = 10;
+  const [docPage, setDocPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     fetchData();
