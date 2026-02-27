@@ -42,7 +42,18 @@ class Task(BaseModel):
     id: str
     title: str
     description: str
+    order: int = 0
     completed: bool = False
+
+class TaskCreate(BaseModel):
+    title: str
+    description: str
+    order: int = 0
+
+class TaskUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    order: Optional[int] = None
 
 class Course(BaseModel):
     id: str
