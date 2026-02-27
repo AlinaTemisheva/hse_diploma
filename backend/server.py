@@ -332,7 +332,7 @@ async def get_courses():
 
 @api_router.get("/documents", response_model=List[Document])
 async def get_documents():
-    return MOCK_DOCUMENTS
+    return sorted(documents_db, key=lambda x: x.order)
 
 @api_router.get("/services", response_model=List[Service])
 async def get_services():
