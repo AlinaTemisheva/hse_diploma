@@ -1,0 +1,175 @@
+<analysis>**original_problem_statement**: The user requested to develop a responsive web application based on a Figma design. The application is an onboarding platform for new employees (referred to as teachers).
+
+**PRODUCT REQUIREMENTS:**
+- **User (Teacher) View:**
+    - Login page with an illustration carousel.
+    - Dashboard with three tabs:
+        - **Tasks:** A checklist of onboarding tasks.
+        - **Learning:** A list of courses/modules to complete.
+        - **Documents:** A list of useful documents and templates.
+- **Admin View:**
+    - Login with a separate admin account ().
+    - Admin panel with a sidebar menu.
+    - **Teachers Management:** List, add, edit, and change the status of teachers. This includes avatar selection/upload.
+    - **Tasks Management:** Full CRUD (Create, Read, Update, Delete) for tasks that are assigned to all teachers.
+    - **Documents Management:** Full CRUD for documents, including the ability to add a link or upload a file.
+    - **Lessons Management:** Full CRUD for creating and managing educational modules and lessons, which should support rich content (longreads).
+
+**User's preferred language**: Russian. The next agent MUST respond in Russian.
+
+**what currently exists?**
+A full-stack application with a React frontend and FastAPI backend.
+- **Authentication:** Role-based JWT authentication distinguishes between regular users ('teacher') and 'admin'.
+- **User Dashboard:** A functional dashboard for teachers displays assigned tasks, mock learning modules, and documents. Teachers can check off tasks. Documents with links show an external link icon.
+- **Admin Panel:** A comprehensive admin dashboard allows for:
+    - **Teacher Management:** CRUD operations for teachers, including status changes and avatar selection (from a predefined list).
+    - **Task Management:** CRUD operations for the global task list.
+    - **Document Management:** CRUD operations for documents, allowing admins to provide a name, description, and an external link.
+- All CRUD operations in the admin panel are handled through a  Sheet (side-page).
+
+**Last working item**:
+- **Last item agent was working**: Implementing the Lessons and Modules feature for the admin panel. The user wants to create rich-text lessons (longreads) grouped into modules. The agent started by installing dependencies for a WYSIWYG editor (, ).
+- **Status**: NOT STARTED (Only dependencies were installed; no backend or frontend code has been written for this feature).
+- **Agent Testing Done**: N
+- **Which testing method agent to use?**: both
+- **User Testing Done**: N
+
+**All Pending/In progress Issue list**:
+There are no outstanding bugs or issues from previous work. The only pending item is the new feature request which is the highest priority.
+
+**In progress Task List**:
+- **Task 1**: Implement Lessons and Modules functionality (P0)
+
+  **Task Detail**:
+  - **Task 1**: Implement full CRUD for Lessons and Modules.
+    - **Where to resume**:
+        1.  **Backend ():** Define data models/structures for  and  (a lesson belongs to a module). Implement , , ,  API endpoints under  and . The lesson content should be able to store HTML from the WYSIWYG editor.
+        2.  **Frontend ():**
+            - Create the UI for managing modules (list, add/edit buttons opening a side-page).
+            - Create the UI for managing lessons within a module. This should open a modal with a WYSIWYG editor ( or  is now installed). The modal should have tabs for Description and Content.
+        3.  **Frontend ():** Implement the user-facing view for modules and lessons, likely displayed in a modal as requested by the user.
+    - **What will be achieved with this?**: A complete content management system for the Learning section of the application, allowing admins to create rich, structured educational content.
+    - **Status**: IN PROGRESS
+    - **Should Test frontend/backend/both after fix?**: both
+    - **Blocked on something**: No.
+
+**Upcoming and Future Tasks**
+- **Task 1**: Implement Backend for File Uploads (P1)
+  - **File & Method**:  will need a new endpoint (e.g., ) and logic to handle multipart/form-data. This will be used for teacher avatars and document files. The current implementation only added UI for uploads but no backend logic. Files could be stored in a directory like .
+- **Task 2**: Connect Frontend File Uploads to Backend (P1)
+  - **File & Method**: In , the  and  functions need to be updated to make API calls to the new upload endpoint when a file is selected, get the file URL back, and save it in the teacher/document record.
+
+**Completed work in this session**
+- **User Authentication**: Implemented role-based login for 'teacher' and 'admin'.
+- **UI/UX Refinements**:
+  - Fixed Login page carousel to match Figma designs.
+  - Corrected Dashboard layout to have a white content card on a gray background.
+  - Fixed tab component styling to be adaptive and match the design.
+  - Removed duplicate close buttons from all side-page forms.
+- **Admin Panel (Feature Complete - except file uploads):**
+  - **Teachers CRUD**: Full management of teachers via a side-page, including status changes and avatar selection.
+  - **Tasks CRUD**: Full management of tasks via a side-page.
+  - **Documents CRUD**: Full management of documents via a side-page, including adding external links.
+- **User Dashboard (Feature Complete):**
+  - Displays tasks, documents, and a placeholder for learning modules.
+  - Task completion can be tracked.
+  - Document links are displayed and clickable.
+
+**Earlier issues found/mentioned but not fixed**
+- **Issue 1**: File upload functionality is incomplete.
+  - **Debug checklist**: The UI for uploading teacher avatars () and documents () was created. However, the backend () has no endpoint or logic to receive, store, and serve these files.
+  - **Why to solve this issue and what will be achieved with this?**: To fulfill the user's requirement of uploading avatars and document files directly, instead of just linking to them.
+  - **Should Test frontend/backend/both after fix**: both
+  - **Is recurring issue?** N
+
+**Known issue recurrence from previous fork**
+- None.
+
+**Code Architecture**
+
+
+**Key Technical Concepts**
+- **Backend**: FastAPI, Pydantic
+- **Frontend**: React, 
+- **Database**: None (currently using in-memory Python lists and dictionaries as a mock database).
+- **UI**: TailwindCSS, Shadcn/UI, Headless UI.
+- **Styling**: Direct CSS in , utility classes from TailwindCSS, and direct modification of  components.
+
+**key DB schema**
+Data is currently mocked in .
+- : 
+- : 
+- : 
+- : 
+- : Tracks completion status per user .
+
+**changes in tech stack**
+- None.
+
+**All files of reference**
+- : Contains the entire backend logic, including all API endpoints, data models, and mock data. Was heavily modified to add admin roles and CRUD for all entities.
+- : Contains the entire frontend logic for the admin panel, including state management and rendering for teachers, tasks, and documents, and the side-page forms.
+- : The main dashboard for the 'teacher' role.
+- : The login page component.
+- : The main application component with routing logic based on user roles.
+- : Contains custom CSS overrides and styles for various components.
+- : A  component that was modified directly to fix styling issues.
+
+**key api endpoints**
+-  (POST): User login.
+-  (GET): Get current user data.
+- , , ,  (GET): Data for the teacher dashboard.
+-  (PUT): Toggles a task's completion for a user.
+-  (GET, POST): Manage teachers.
+-  (PUT): Edit a teacher.
+-  (GET, POST): Manage tasks.
+-  (PUT, DELETE): Edit/delete a task.
+-  (GET, POST): Manage documents.
+-  (PUT, DELETE): Edit/delete a document.
+
+**Critical Info for New Agent**
+- **Role-Based Access**: The app has two roles:  and . Authentication is handled in  and routing in . The backend returns the user's role upon successful login.
+- **Mock Data**: All data is currently stored in-memory in . There is no persistent database.
+- **CRUD Pattern**: All admin CRUD operations use a single, dynamic side-page component ( from ) implemented within .
+- **Styling**: Be aware that some  components might need direct modification () or forceful CSS overrides ( or high specificity) to match the Figma design, as seen with the Tabs component.
+
+**documents and test reports created in this job**
+- Numerous test reports are available in , with the latest being .
+
+**Last 10 User Messages and any pending HUMAN messages**
+1.  **User**: Request to add a Lessons page for admins. Modules are managed via side-page, and lessons via a modal with a rich-text editor. User view should also be in a modal. Provided a visual example. (PENDING - In Progress)
+2.  **Agent**: Acknowledged the request and began by installing WYSIWYG editor dependencies.
+3.  **User**: Pointed out that the documents side-page has two close buttons and no file upload capability. (RESOLVED)
+4.  **Agent**: Fixed the duplicate close buttons and added a file upload UI to the documents form.
+5.  **User**: Request to implement CRUD for the Documents page in the admin panel, including a link field. (RESOLVED)
+6.  **Agent**: Implemented Documents CRUD on backend and frontend.
+7.  **User**: Request to implement CRUD for the Tasks page in the admin panel. (RESOLVED)
+8.  **Agent**: Implemented Tasks CRUD on backend and frontend.
+9.  **User**: Request to add editing for teachers, including status changes and avatar upload/selection. (RESOLVED)
+10. **Agent**: Implemented teacher editing functionality.
+
+**Project Health Check:**
+- **Broken**:
+  - File upload functionality is not implemented on the backend. The UI exists but is not functional.
+- **Mocked**:
+  - The entire database is mocked using in-memory Python lists in . No data is persistent across server restarts.
+
+**3rd Party Integrations**
+- None.
+
+**Testing status**
+- **Testing agent used after significant changes**: YES. The agent consistently used  after every major feature implementation and bugfix cycle.
+- **Troubleshoot agent used after agent stuck in loop**: NO
+- **Test files created**: None, but multiple test reports were generated by the testing agent in .
+- **Known regressions**: None.
+
+**Credentials to test flow:**
+- **User/Teacher**:
+  - Email: 
+  - Password: 
+- **Admin**:
+  - Email: 
+  - Password: 
+
+**What agent forgot to execute**
+- The agent added UI elements for file uploads (for teacher avatars and documents) as requested by the user, but it completely forgot to implement the corresponding backend logic. There is no API endpoint to handle file uploads, no file storage mechanism, and the frontend forms don't actually send the file data anywhere.</analysis>
