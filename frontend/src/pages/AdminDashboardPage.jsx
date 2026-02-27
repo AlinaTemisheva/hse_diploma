@@ -281,15 +281,33 @@ export default function AdminDashboardPage({ user, onLogout }) {
     }
   };
 
-  const handleFileUpload = (e) => {
+  const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setCustomAvatarUrl(event.target?.result);
-        setSelectedAvatar(null);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+    
+    // Check file size (10 MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Файл слишком большой. Максимум 10 МБ");
+      return;
+    }
+    
+    // Upload to server
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+      const response = await axios.post(`${API}/upload?file_type=image`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      
+      // Set the uploaded URL
+      const uploadedUrl = `${BACKEND_URL}${response.data.url}`;
+      setCustomAvatarUrl(uploadedUrl);
+      setSelectedAvatar(null);
+      toast.success("Фото загружено");
+    } catch (error) {
+      const message = error.response?.data?.detail || "Ошибка загрузки файла";
+      toast.error(message);
     }
   };
 
