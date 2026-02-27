@@ -104,6 +104,6 @@
 - Shadcn/UI components at /app/frontend/src/components/ui/
 
 ## Next Tasks
-1. Persist data in MongoDB instead of in-memory
-2. Add lesson completion tracking per user
-3. Real JWT authentication
+1. Real JWT authentication with token refresh
+2. Password reset flow
+3. Course analytics for admin
