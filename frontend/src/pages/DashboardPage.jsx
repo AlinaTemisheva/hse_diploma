@@ -93,10 +93,11 @@ export default function DashboardPage({ user, onLogout }) {
   const openModuleLessons = async (module) => {
     setSelectedModule(module);
     setSelectedLesson(null);
+    setModuleLessons([]); // Clear cache
+    setIsLessonModalOpen(true);
     try {
       const response = await axios.get(`${API}/modules/${module.id}/lessons`);
       setModuleLessons(response.data);
-      setIsLessonModalOpen(true);
     } catch (error) {
       toast.error("Ошибка загрузки уроков");
     }
@@ -104,6 +105,7 @@ export default function DashboardPage({ user, onLogout }) {
 
   const openLesson = async (lesson) => {
     try {
+      // Always fetch fresh data from server
       const response = await axios.get(`${API}/lessons/${lesson.id}`);
       setSelectedLesson(response.data);
     } catch (error) {
@@ -111,8 +113,17 @@ export default function DashboardPage({ user, onLogout }) {
     }
   };
 
-  const goBackToLessons = () => {
+  const goBackToLessons = async () => {
     setSelectedLesson(null);
+    // Refresh lessons list when going back
+    if (selectedModule) {
+      try {
+        const response = await axios.get(`${API}/modules/${selectedModule.id}/lessons`);
+        setModuleLessons(response.data);
+      } catch (error) {
+        console.error("Error refreshing lessons:", error);
+      }
+    }
   };
 
   const handleTaskToggle = async (taskId, currentState) => {
