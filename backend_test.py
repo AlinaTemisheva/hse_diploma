@@ -647,9 +647,12 @@ def main():
     for test in admin_tests:
         test()
     
-    # Run comprehensive teacher CRUD tests
+    # Run comprehensive CRUD tests
     print("\n🔄 Testing Teacher CRUD Operations")
     tester.test_teacher_crud_operations()
+    
+    print("\n📋 Testing Tasks CRUD Operations")
+    tester.test_tasks_crud_operations()
     
     print(f"\n📊 Final Results: {tester.tests_passed}/{tester.tests_run} tests passed")
     print("=" * 60)
