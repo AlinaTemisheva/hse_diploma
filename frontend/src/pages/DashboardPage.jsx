@@ -103,7 +103,7 @@ export default function DashboardPage({ user, userId, onLogout }) {
     setModuleLessons([]); // Clear cache
     setIsLessonModalOpen(true);
     try {
-      const response = await axios.get(`${API}/modules/${module.id}/lessons`);
+      const response = await axios.get(`${API}/modules/${module.id}/lessons?user_id=${currentUserId}`);
       setModuleLessons(response.data);
     } catch (error) {
       toast.error("Ошибка загрузки уроков");
@@ -113,12 +113,12 @@ export default function DashboardPage({ user, userId, onLogout }) {
   const openLesson = async (lesson) => {
     try {
       // Always fetch fresh data from server
-      const response = await axios.get(`${API}/lessons/${lesson.id}`);
+      const response = await axios.get(`${API}/lessons/${lesson.id}?user_id=${currentUserId}`);
       setSelectedLesson(response.data);
       
       // Mark as in_progress if not started
       if (!lesson.progress_status || lesson.progress_status === "not_started") {
-        await axios.put(`${API}/lessons/${lesson.id}/progress`, { status: "in_progress" });
+        await axios.put(`${API}/lessons/${lesson.id}/progress?user_id=${currentUserId}`, { status: "in_progress" });
         // Update local state
         setModuleLessons(prev => prev.map(l => 
           l.id === lesson.id ? { ...l, progress_status: "in_progress" } : l
@@ -133,7 +133,7 @@ export default function DashboardPage({ user, userId, onLogout }) {
     if (!selectedLesson) return;
     
     try {
-      await axios.put(`${API}/lessons/${selectedLesson.id}/progress`, { status: "completed" });
+      await axios.put(`${API}/lessons/${selectedLesson.id}/progress?user_id=${currentUserId}`, { status: "completed" });
       
       // Update local state
       setSelectedLesson(prev => ({ ...prev, progress_status: "completed" }));
@@ -142,7 +142,7 @@ export default function DashboardPage({ user, userId, onLogout }) {
       ));
       
       // Refresh stats
-      const statsRes = await axios.get(`${API}/user/stats`);
+      const statsRes = await axios.get(`${API}/user/stats?user_id=${currentUserId}`);
       setStats(statsRes.data);
       
       toast.success("Урок отмечен как пройденный!");
@@ -156,7 +156,7 @@ export default function DashboardPage({ user, userId, onLogout }) {
     // Refresh lessons list when going back
     if (selectedModule) {
       try {
-        const response = await axios.get(`${API}/modules/${selectedModule.id}/lessons`);
+        const response = await axios.get(`${API}/modules/${selectedModule.id}/lessons?user_id=${currentUserId}`);
         setModuleLessons(response.data);
       } catch (error) {
         console.error("Error refreshing lessons:", error);
