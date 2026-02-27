@@ -1,4 +1,5 @@
-from fastapi import FastAPI, APIRouter, HTTPException, status
+from fastapi import FastAPI, APIRouter, HTTPException, status, UploadFile, File
+from fastapi.responses import FileResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -11,9 +12,17 @@ import uuid
 from datetime import datetime, timezone
 import secrets
 import string
+import shutil
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
+
+# Upload directory
+UPLOAD_DIR = ROOT_DIR.parent / "uploads"
+UPLOAD_DIR.mkdir(exist_ok=True)
+MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
+ALLOWED_IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
+ALLOWED_DOC_EXTENSIONS = {".doc", ".docx", ".xls", ".xlsx", ".pdf", ".zip", ".ppt", ".pptx"}
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
