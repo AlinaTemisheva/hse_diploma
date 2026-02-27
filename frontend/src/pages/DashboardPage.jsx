@@ -173,7 +173,7 @@ export default function DashboardPage({ user, userId, onLogout }) {
     ));
 
     try {
-      await axios.put(`${API}/tasks/${taskId}/toggle`, { completed: newState });
+      await axios.put(`${API}/tasks/${taskId}/toggle?user_id=${currentUserId}`, { completed: newState });
       
       // Update stats
       setStats(prev => ({
