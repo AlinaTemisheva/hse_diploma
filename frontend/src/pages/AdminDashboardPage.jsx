@@ -1670,18 +1670,56 @@ export default function AdminDashboardPage({ user, onLogout }) {
               </TabsContent>
               
               <TabsContent value="content" className="flex-1 overflow-hidden">
-                <div className="h-[400px]">
-                  <ReactQuill
-                    theme="snow"
-                    value={lessonForm.content}
-                    onChange={(content) => setLessonForm({ ...lessonForm, content })}
-                    modules={quillModules}
-                    formats={quillFormats}
-                    className="h-[350px]"
-                    placeholder="Введите содержание урока..."
-                    data-testid="lesson-content-editor"
-                  />
+                {/* Editor Mode Toggle */}
+                <div className="flex items-center gap-2 mb-3">
+                  <button
+                    type="button"
+                    onClick={() => setEditorMode('visual')}
+                    className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
+                      editorMode === 'visual' 
+                        ? 'bg-[#1B318E] text-white' 
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                    data-testid="editor-mode-visual"
+                  >
+                    Визуальный редактор
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditorMode('html')}
+                    className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
+                      editorMode === 'html' 
+                        ? 'bg-[#1B318E] text-white' 
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                    data-testid="editor-mode-html"
+                  >
+                    HTML код
+                  </button>
                 </div>
+                
+                {editorMode === 'visual' ? (
+                  <div className="h-[350px]">
+                    <ReactQuill
+                      theme="snow"
+                      value={lessonForm.content}
+                      onChange={(content) => setLessonForm({ ...lessonForm, content })}
+                      modules={quillModules}
+                      formats={quillFormats}
+                      className="h-[300px]"
+                      placeholder="Введите содержание урока..."
+                      data-testid="lesson-content-editor"
+                    />
+                  </div>
+                ) : (
+                  <Textarea
+                    value={lessonForm.content}
+                    onChange={(e) => setLessonForm({ ...lessonForm, content: e.target.value })}
+                    className="h-[350px] font-mono text-sm rounded-lg border-gray-200 resize-none"
+                    placeholder="<h2>Заголовок</h2>&#10;<p>Текст параграфа</p>&#10;<ul>&#10;  <li>Пункт списка</li>&#10;</ul>"
+                    data-testid="lesson-content-html"
+                  />
+                )}
               </TabsContent>
             </Tabs>
           </div>
