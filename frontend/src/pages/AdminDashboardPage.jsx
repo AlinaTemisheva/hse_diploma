@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
@@ -14,7 +15,11 @@ import {
   LogOut,
   X,
   Upload,
-  Check
+  Check,
+  Minus,
+  Trash2,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import axios from "axios";
 
@@ -29,7 +34,7 @@ const MENU_ITEMS = [
   { id: "documents", label: "Документы", icon: FileText },
 ];
 
-// Status options
+// Status options for teachers
 const STATUS_OPTIONS = [
   { value: "registered", label: "Зарегистрирован" },
   { value: "in_progress", label: "В процессе" },
@@ -37,7 +42,6 @@ const STATUS_OPTIONS = [
   { value: "blocked", label: "Заблокирован" },
 ];
 
-// Status labels and styles
 const STATUS_LABELS = {
   registered: "Зарегистрирован",
   in_progress: "В процессе",
@@ -52,7 +56,7 @@ const STATUS_STYLES = {
   blocked: "bg-red-50 text-red-700"
 };
 
-// Avatar options for selection
+// Avatar options
 const AVATAR_OPTIONS = [
   { id: 1, url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" },
   { id: 2, url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka" },
@@ -78,11 +82,12 @@ export default function AdminDashboardPage({ user, onLogout }) {
   
   // Sheet states
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [sheetType, setSheetType] = useState(null); // 'teacher' | 'task'
   const [isEditMode, setIsEditMode] = useState(false);
-  const [editingTeacher, setEditingTeacher] = useState(null);
+  const [editingItem, setEditingItem] = useState(null);
   
-  // Form states
-  const [formData, setFormData] = useState({ 
+  // Teacher form states
+  const [teacherForm, setTeacherForm] = useState({ 
     name: "", 
     email: "", 
     status: "in_progress",
@@ -90,7 +95,19 @@ export default function AdminDashboardPage({ user, onLogout }) {
   });
   const [selectedAvatar, setSelectedAvatar] = useState(null);
   const [customAvatarUrl, setCustomAvatarUrl] = useState("");
+  
+  // Task form states
+  const [taskForm, setTaskForm] = useState({
+    title: "",
+    description: "",
+    order: 1
+  });
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Pagination for tasks
+  const [taskPage, setTaskPage] = useState(1);
+  const tasksPerPage = 10;
 
   useEffect(() => {
     fetchData();
@@ -118,25 +135,27 @@ export default function AdminDashboardPage({ user, onLogout }) {
     }
   };
 
-  const openCreateSheet = () => {
+  // ============ Teacher Functions ============
+  const openTeacherCreate = () => {
+    setSheetType('teacher');
     setIsEditMode(false);
-    setEditingTeacher(null);
-    setFormData({ name: "", email: "", status: "in_progress", avatar_url: "" });
+    setEditingItem(null);
+    setTeacherForm({ name: "", email: "", status: "in_progress", avatar_url: "" });
     setSelectedAvatar(null);
     setCustomAvatarUrl("");
     setIsSheetOpen(true);
   };
 
-  const openEditSheet = (teacher) => {
+  const openTeacherEdit = (teacher) => {
+    setSheetType('teacher');
     setIsEditMode(true);
-    setEditingTeacher(teacher);
-    setFormData({
+    setEditingItem(teacher);
+    setTeacherForm({
       name: teacher.name,
       email: teacher.email,
       status: teacher.status,
       avatar_url: teacher.avatar_url
     });
-    // Check if current avatar is in options
     const existingAvatar = AVATAR_OPTIONS.find(a => a.url === teacher.avatar_url);
     if (existingAvatar) {
       setSelectedAvatar(existingAvatar.id);
@@ -146,15 +165,6 @@ export default function AdminDashboardPage({ user, onLogout }) {
       setCustomAvatarUrl(teacher.avatar_url || "");
     }
     setIsSheetOpen(true);
-  };
-
-  const closeSheet = () => {
-    setIsSheetOpen(false);
-    setIsEditMode(false);
-    setEditingTeacher(null);
-    setFormData({ name: "", email: "", status: "in_progress", avatar_url: "" });
-    setSelectedAvatar(null);
-    setCustomAvatarUrl("");
   };
 
   const getAvatarUrl = () => {
@@ -167,8 +177,8 @@ export default function AdminDashboardPage({ user, onLogout }) {
     return "";
   };
 
-  const handleSubmit = async () => {
-    if (!formData.name.trim() || !formData.email.trim()) {
+  const handleTeacherSubmit = async () => {
+    if (!teacherForm.name.trim() || !teacherForm.email.trim()) {
       toast.error("Заполните все обязательные поля");
       return;
     }
@@ -177,24 +187,19 @@ export default function AdminDashboardPage({ user, onLogout }) {
     const avatarUrl = getAvatarUrl();
 
     try {
-      if (isEditMode && editingTeacher) {
-        // Update existing teacher
-        const response = await axios.put(`${API}/admin/teachers/${editingTeacher.id}`, {
-          name: formData.name,
-          email: formData.email,
-          status: formData.status,
+      if (isEditMode && editingItem) {
+        const response = await axios.put(`${API}/admin/teachers/${editingItem.id}`, {
+          name: teacherForm.name,
+          email: teacherForm.email,
+          status: teacherForm.status,
           avatar_url: avatarUrl || undefined
         });
-        
-        setTeachers(teachers.map(t => 
-          t.id === editingTeacher.id ? response.data : t
-        ));
+        setTeachers(teachers.map(t => t.id === editingItem.id ? response.data : t));
         toast.success("Преподаватель обновлён");
       } else {
-        // Create new teacher
         const response = await axios.post(`${API}/admin/teachers`, {
-          name: formData.name,
-          email: formData.email,
+          name: teacherForm.name,
+          email: teacherForm.email,
           avatar_url: avatarUrl || undefined
         });
         setTeachers([...teachers, response.data]);
@@ -212,7 +217,6 @@ export default function AdminDashboardPage({ user, onLogout }) {
   const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      // For demo, we'll create a data URL. In production, you'd upload to server
       const reader = new FileReader();
       reader.onload = (event) => {
         setCustomAvatarUrl(event.target?.result);
@@ -220,6 +224,88 @@ export default function AdminDashboardPage({ user, onLogout }) {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  // ============ Task Functions ============
+  const openTaskCreate = () => {
+    setSheetType('task');
+    setIsEditMode(false);
+    setEditingItem(null);
+    setTaskForm({ title: "", description: "", order: tasks.length + 1 });
+    setIsSheetOpen(true);
+  };
+
+  const openTaskEdit = (task) => {
+    setSheetType('task');
+    setIsEditMode(true);
+    setEditingItem(task);
+    setTaskForm({
+      title: task.title,
+      description: task.description,
+      order: task.order
+    });
+    setIsSheetOpen(true);
+  };
+
+  const handleTaskSubmit = async () => {
+    if (!taskForm.title.trim()) {
+      toast.error("Введите название задачи");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      if (isEditMode && editingItem) {
+        const response = await axios.put(`${API}/admin/tasks/${editingItem.id}`, {
+          title: taskForm.title,
+          description: taskForm.description,
+          order: taskForm.order
+        });
+        setTasks(tasks.map(t => t.id === editingItem.id ? response.data : t));
+        toast.success("Задача обновлена");
+      } else {
+        const response = await axios.post(`${API}/admin/tasks`, {
+          title: taskForm.title,
+          description: taskForm.description,
+          order: taskForm.order
+        });
+        setTasks([...tasks, response.data]);
+        toast.success("Задача добавлена");
+      }
+      closeSheet();
+    } catch (error) {
+      const message = error.response?.data?.detail || "Ошибка сохранения";
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleTaskDelete = async () => {
+    if (!editingItem) return;
+    
+    if (!window.confirm("Удалить эту задачу?")) return;
+
+    setIsSubmitting(true);
+    try {
+      await axios.delete(`${API}/admin/tasks/${editingItem.id}`);
+      setTasks(tasks.filter(t => t.id !== editingItem.id));
+      toast.success("Задача удалена");
+      closeSheet();
+    } catch (error) {
+      toast.error("Ошибка удаления");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // ============ Common Functions ============
+  const closeSheet = () => {
+    setIsSheetOpen(false);
+    setSheetType(null);
+    setIsEditMode(false);
+    setEditingItem(null);
   };
 
   const getInitials = (name) => {
@@ -230,6 +316,11 @@ export default function AdminDashboardPage({ user, onLogout }) {
     return name.substring(0, 2).toUpperCase();
   };
 
+  // Paginated tasks
+  const paginatedTasks = tasks.slice((taskPage - 1) * tasksPerPage, taskPage * tasksPerPage);
+  const totalTaskPages = Math.ceil(tasks.length / tasksPerPage);
+
+  // ============ Render Content ============
   const renderContent = () => {
     switch (activeMenu) {
       case "teachers":
@@ -238,7 +329,7 @@ export default function AdminDashboardPage({ user, onLogout }) {
             <div className="flex items-center justify-between mb-6">
               <h1 className="text-3xl font-bold text-gray-900 font-heading">Преподаватели</h1>
               <Button 
-                onClick={openCreateSheet}
+                onClick={openTeacherCreate}
                 className="bg-[#1B318E] hover:bg-[#152570] text-white px-6"
                 data-testid="add-teacher-btn"
               >
@@ -252,9 +343,7 @@ export default function AdminDashboardPage({ user, onLogout }) {
                 <thead>
                   <tr className="border-b border-gray-200">
                     <th className="text-left py-4 px-6 text-sm font-medium text-gray-500">ФИО</th>
-                    <th className="text-left py-4 px-6 text-sm font-medium text-gray-500">
-                      Email <span className="text-gray-400">↑↓</span>
-                    </th>
+                    <th className="text-left py-4 px-6 text-sm font-medium text-gray-500">Email</th>
                     <th className="text-left py-4 px-6 text-sm font-medium text-gray-500">Статус</th>
                   </tr>
                 </thead>
@@ -263,7 +352,7 @@ export default function AdminDashboardPage({ user, onLogout }) {
                     <tr 
                       key={teacher.id} 
                       className="border-b border-gray-100 last:border-0 hover:bg-gray-50 cursor-pointer transition-colors" 
-                      onClick={() => openEditSheet(teacher)}
+                      onClick={() => openTeacherEdit(teacher)}
                       data-testid={`teacher-row-${teacher.id}`}
                     >
                       <td className="py-4 px-6">
@@ -299,27 +388,78 @@ export default function AdminDashboardPage({ user, onLogout }) {
       case "tasks":
         return (
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-6 font-heading">Задачи</h1>
+            <div className="flex items-center justify-between mb-6">
+              <h1 className="text-3xl font-bold text-gray-900 font-heading">Задачи</h1>
+              <Button 
+                onClick={openTaskCreate}
+                className="bg-[#1B318E] hover:bg-[#152570] text-white px-6"
+                data-testid="add-task-btn"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Добавить задачу
+              </Button>
+            </div>
+            
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-200">
-                    <th className="text-left py-4 px-6 text-sm font-medium text-gray-500">№</th>
-                    <th className="text-left py-4 px-6 text-sm font-medium text-gray-500">Название</th>
-                    <th className="text-left py-4 px-6 text-sm font-medium text-gray-500">Описание</th>
+                    <th className="text-left py-4 px-6 text-sm font-medium text-gray-500 w-20">№</th>
+                    <th className="text-left py-4 px-6 text-sm font-medium text-gray-500">Задача</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {tasks.map((task, index) => (
-                    <tr key={task.id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50">
-                      <td className="py-4 px-6 text-gray-500">{index + 1}</td>
+                  {paginatedTasks.map((task) => (
+                    <tr 
+                      key={task.id} 
+                      className="border-b border-gray-100 last:border-0 hover:bg-gray-50 cursor-pointer transition-colors"
+                      onClick={() => openTaskEdit(task)}
+                      data-testid={`task-row-${task.id}`}
+                    >
+                      <td className="py-4 px-6 text-gray-500">{task.order}</td>
                       <td className="py-4 px-6 font-medium text-gray-900">{task.title}</td>
-                      <td className="py-4 px-6 text-gray-600">{task.description}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination */}
+            {totalTaskPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-6">
+                <button
+                  onClick={() => setTaskPage(p => Math.max(1, p - 1))}
+                  disabled={taskPage === 1}
+                  className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Назад
+                </button>
+                
+                {[...Array(totalTaskPages)].map((_, i) => (
+                  <button
+                    key={i + 1}
+                    onClick={() => setTaskPage(i + 1)}
+                    className={`w-10 h-10 rounded-lg text-sm font-medium ${
+                      taskPage === i + 1 
+                        ? "bg-[#1B318E] text-white" 
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+                
+                <button
+                  onClick={() => setTaskPage(p => Math.min(totalTaskPages, p + 1))}
+                  disabled={taskPage === totalTaskPages}
+                  className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Вперед
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
           </div>
         );
       
@@ -386,11 +526,247 @@ export default function AdminDashboardPage({ user, onLogout }) {
     }
   };
 
+  // ============ Render Sheet Content ============
+  const renderSheetContent = () => {
+    if (sheetType === 'teacher') {
+      return (
+        <>
+          <SheetHeader className="flex-row items-center justify-between space-y-0 pb-6">
+            <SheetTitle className="text-xl font-semibold">
+              {isEditMode ? "Редактирование преподавателя" : "Добавление преподавателя"}
+            </SheetTitle>
+            <button onClick={closeSheet} className="text-gray-400 hover:text-gray-600">
+              <X className="w-5 h-5" />
+            </button>
+          </SheetHeader>
+          
+          <div className="flex-1 space-y-6 overflow-y-auto">
+            {/* Avatar Selection */}
+            <div className="space-y-3">
+              <Label className="text-base font-medium">Аватар</Label>
+              
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-20 h-20 rounded-full bg-gray-100 overflow-hidden border-2 border-gray-200">
+                  {(selectedAvatar || customAvatarUrl) ? (
+                    <img src={getAvatarUrl()} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : teacherForm.name ? (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-600 text-xl font-medium">
+                      {getInitials(teacherForm.name)}
+                    </div>
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400">
+                      <Users className="w-8 h-8" />
+                    </div>
+                  )}
+                </div>
+                
+                <label className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                  <Upload className="w-4 h-4" />
+                  <span className="text-sm">Загрузить фото</span>
+                  <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+                </label>
+              </div>
+              
+              <div className="grid grid-cols-6 gap-2">
+                {AVATAR_OPTIONS.map((avatar) => (
+                  <button
+                    key={avatar.id}
+                    type="button"
+                    onClick={() => { setSelectedAvatar(avatar.id); setCustomAvatarUrl(""); }}
+                    className={`relative w-12 h-12 rounded-full overflow-hidden border-2 transition-all ${
+                      selectedAvatar === avatar.id 
+                        ? "border-[#1B318E] ring-2 ring-[#1B318E]/20" 
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <img src={avatar.url} alt={`Avatar ${avatar.id}`} className="w-full h-full" />
+                    {selectedAvatar === avatar.id && (
+                      <div className="absolute inset-0 bg-[#1B318E]/20 flex items-center justify-center">
+                        <Check className="w-4 h-4 text-[#1B318E]" />
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Name Field */}
+            <div className="space-y-2">
+              <Label className="text-base font-medium">ФИО *</Label>
+              <Input
+                value={teacherForm.name}
+                onChange={(e) => setTeacherForm({ ...teacherForm, name: e.target.value })}
+                className="h-12 rounded-lg border-gray-200"
+                placeholder="Иванов Иван Иванович"
+                data-testid="teacher-name-input"
+              />
+            </div>
+            
+            {/* Email Field */}
+            <div className="space-y-2">
+              <Label className="text-base font-medium">Email *</Label>
+              <Input
+                type="email"
+                value={teacherForm.email}
+                onChange={(e) => setTeacherForm({ ...teacherForm, email: e.target.value })}
+                className="h-12 rounded-lg border-gray-200"
+                placeholder="email@hse.ru"
+                data-testid="teacher-email-input"
+              />
+              {!isEditMode && (
+                <p className="text-sm text-gray-500">
+                  Пароль от личного кабинета будет сформирован автоматически
+                </p>
+              )}
+            </div>
+
+            {/* Status Field (only in edit mode) */}
+            {isEditMode && (
+              <div className="space-y-2">
+                <Label className="text-base font-medium">Статус</Label>
+                <Select 
+                  value={teacherForm.status} 
+                  onValueChange={(value) => setTeacherForm({ ...teacherForm, status: value })}
+                >
+                  <SelectTrigger className="h-12 rounded-lg border-gray-200" data-testid="status-select">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {STATUS_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
+
+          <SheetFooter className="flex-col gap-3 mt-auto pt-6">
+            <Button
+              onClick={handleTeacherSubmit}
+              disabled={isSubmitting}
+              className="w-full h-12 bg-[#1B318E] hover:bg-[#152570] text-white rounded-lg"
+              data-testid="save-teacher-btn"
+            >
+              {isSubmitting ? "Сохранение..." : "Сохранить"}
+            </Button>
+            <Button variant="outline" onClick={closeSheet} className="w-full h-12 rounded-lg border-gray-200">
+              Закрыть
+            </Button>
+          </SheetFooter>
+        </>
+      );
+    }
+
+    if (sheetType === 'task') {
+      return (
+        <>
+          <SheetHeader className="flex-row items-center justify-between space-y-0 pb-6">
+            <SheetTitle className="text-xl font-semibold">
+              {isEditMode ? "Редактирование задачи" : "Добавление задачи"}
+            </SheetTitle>
+            <button onClick={closeSheet} className="text-gray-400 hover:text-gray-600">
+              <X className="w-5 h-5" />
+            </button>
+          </SheetHeader>
+          
+          <div className="flex-1 space-y-6 overflow-y-auto">
+            {/* Task Title */}
+            <div className="space-y-2">
+              <Label className="text-base font-medium">Название задачи *</Label>
+              <Input
+                value={taskForm.title}
+                onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })}
+                className="h-12 rounded-lg border-gray-200"
+                placeholder="Введите название задачи"
+                data-testid="task-title-input"
+              />
+            </div>
+
+            {/* Task Description */}
+            <div className="space-y-2">
+              <Label className="text-base font-medium">Описание</Label>
+              <Textarea
+                value={taskForm.description}
+                onChange={(e) => setTaskForm({ ...taskForm, description: e.target.value })}
+                className="min-h-[120px] rounded-lg border-gray-200 resize-none"
+                placeholder="Подробное описание задачи"
+                data-testid="task-description-input"
+              />
+            </div>
+
+            {/* Order Number */}
+            <div className="space-y-2">
+              <Label className="text-base font-medium">Порядковый номер</Label>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setTaskForm({ ...taskForm, order: Math.max(1, taskForm.order - 1) })}
+                  className="w-12 h-12 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                  data-testid="order-minus-btn"
+                >
+                  <Minus className="w-5 h-5 text-gray-600" />
+                </button>
+                <Input
+                  type="number"
+                  value={taskForm.order}
+                  onChange={(e) => setTaskForm({ ...taskForm, order: Math.max(1, parseInt(e.target.value) || 1) })}
+                  className="h-12 w-24 text-center rounded-lg border-gray-200"
+                  min="1"
+                  data-testid="task-order-input"
+                />
+                <button
+                  type="button"
+                  onClick={() => setTaskForm({ ...taskForm, order: taskForm.order + 1 })}
+                  className="w-12 h-12 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                  data-testid="order-plus-btn"
+                >
+                  <Plus className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <SheetFooter className="flex-col gap-3 mt-auto pt-6">
+            <Button
+              onClick={handleTaskSubmit}
+              disabled={isSubmitting}
+              className="w-full h-12 bg-[#1B318E] hover:bg-[#152570] text-white rounded-lg"
+              data-testid="save-task-btn"
+            >
+              {isSubmitting ? "Сохранение..." : "Сохранить"}
+            </Button>
+            
+            {isEditMode && (
+              <Button 
+                variant="outline" 
+                onClick={handleTaskDelete}
+                disabled={isSubmitting}
+                className="w-full h-12 rounded-lg border-red-200 text-red-600 hover:bg-red-50"
+                data-testid="delete-task-btn"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Удалить задачу
+              </Button>
+            )}
+            
+            <Button variant="outline" onClick={closeSheet} className="w-full h-12 rounded-lg border-gray-200">
+              Закрыть
+            </Button>
+          </SheetFooter>
+        </>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <div className="min-h-screen bg-white flex" data-testid="admin-dashboard">
       {/* Sidebar */}
       <aside className="w-64 border-r border-gray-200 flex flex-col">
-        {/* Logo & User */}
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-[#1B318E] flex items-center justify-center">
@@ -403,7 +779,6 @@ export default function AdminDashboardPage({ user, onLogout }) {
           </div>
         </div>
         
-        {/* Menu */}
         <nav className="flex-1 p-4">
           <ul className="space-y-1">
             {MENU_ITEMS.map((item) => {
@@ -429,7 +804,6 @@ export default function AdminDashboardPage({ user, onLogout }) {
           </ul>
         </nav>
 
-        {/* Logout */}
         <div className="p-4 border-t border-gray-200">
           <button
             onClick={onLogout}
@@ -447,163 +821,10 @@ export default function AdminDashboardPage({ user, onLogout }) {
         {renderContent()}
       </main>
 
-      {/* Add/Edit Teacher Sheet */}
+      {/* Sheet */}
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-        <SheetContent className="w-full sm:max-w-lg flex flex-col overflow-y-auto">
-          <SheetHeader className="flex-row items-center justify-between space-y-0 pb-6">
-            <SheetTitle className="text-xl font-semibold">
-              {isEditMode ? "Редактирование преподавателя" : "Добавление преподавателя"}
-            </SheetTitle>
-            <button 
-              onClick={closeSheet}
-              className="text-gray-400 hover:text-gray-600"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </SheetHeader>
-          
-          <div className="flex-1 space-y-6">
-            {/* Avatar Selection */}
-            <div className="space-y-3">
-              <Label className="text-base font-medium">Аватар</Label>
-              
-              {/* Current/Selected Avatar Preview */}
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-20 h-20 rounded-full bg-gray-100 overflow-hidden border-2 border-gray-200">
-                  {(selectedAvatar || customAvatarUrl) ? (
-                    <img 
-                      src={getAvatarUrl()} 
-                      alt="Avatar"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : formData.name ? (
-                    <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-600 text-xl font-medium">
-                      {getInitials(formData.name)}
-                    </div>
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400">
-                      <Users className="w-8 h-8" />
-                    </div>
-                  )}
-                </div>
-                
-                {/* Upload Button */}
-                <div>
-                  <label className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                    <Upload className="w-4 h-4" />
-                    <span className="text-sm">Загрузить фото</span>
-                    <input 
-                      type="file" 
-                      accept="image/*"
-                      onChange={handleFileUpload}
-                      className="hidden"
-                      data-testid="avatar-upload"
-                    />
-                  </label>
-                </div>
-              </div>
-              
-              {/* Avatar Options Grid */}
-              <div className="grid grid-cols-6 gap-2">
-                {AVATAR_OPTIONS.map((avatar) => (
-                  <button
-                    key={avatar.id}
-                    type="button"
-                    onClick={() => {
-                      setSelectedAvatar(avatar.id);
-                      setCustomAvatarUrl("");
-                    }}
-                    className={`relative w-12 h-12 rounded-full overflow-hidden border-2 transition-all ${
-                      selectedAvatar === avatar.id 
-                        ? "border-[#1B318E] ring-2 ring-[#1B318E]/20" 
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                    data-testid={`avatar-option-${avatar.id}`}
-                  >
-                    <img src={avatar.url} alt={`Avatar ${avatar.id}`} className="w-full h-full" />
-                    {selectedAvatar === avatar.id && (
-                      <div className="absolute inset-0 bg-[#1B318E]/20 flex items-center justify-center">
-                        <Check className="w-4 h-4 text-[#1B318E]" />
-                      </div>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Name Field */}
-            <div className="space-y-2">
-              <Label htmlFor="teacher-name" className="text-base font-medium">ФИО *</Label>
-              <Input
-                id="teacher-name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="h-12 rounded-lg border-gray-200"
-                placeholder="Иванов Иван Иванович"
-                data-testid="teacher-name-input"
-              />
-            </div>
-            
-            {/* Email Field */}
-            <div className="space-y-2">
-              <Label htmlFor="teacher-email" className="text-base font-medium">Email *</Label>
-              <Input
-                id="teacher-email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="h-12 rounded-lg border-gray-200"
-                placeholder="email@hse.ru"
-                data-testid="teacher-email-input"
-              />
-              {!isEditMode && (
-                <p className="text-sm text-gray-500 leading-relaxed">
-                  Пароль от личного кабинета будет сформирован автоматически и отправлен на почту в приглашении
-                </p>
-              )}
-            </div>
-
-            {/* Status Field (only in edit mode) */}
-            {isEditMode && (
-              <div className="space-y-2">
-                <Label className="text-base font-medium">Статус</Label>
-                <Select 
-                  value={formData.status} 
-                  onValueChange={(value) => setFormData({ ...formData, status: value })}
-                >
-                  <SelectTrigger className="h-12 rounded-lg border-gray-200" data-testid="status-select">
-                    <SelectValue placeholder="Выберите статус" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {STATUS_OPTIONS.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-          </div>
-
-          <SheetFooter className="flex-col gap-3 mt-auto pt-6">
-            <Button
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-              className="w-full h-12 bg-[#1B318E] hover:bg-[#152570] text-white rounded-lg"
-              data-testid="save-teacher-btn"
-            >
-              {isSubmitting ? "Сохранение..." : "Сохранить"}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={closeSheet}
-              className="w-full h-12 rounded-lg border-gray-200"
-              data-testid="close-sheet-btn"
-            >
-              Закрыть
-            </Button>
-          </SheetFooter>
+        <SheetContent className="w-full sm:max-w-lg flex flex-col">
+          {renderSheetContent()}
         </SheetContent>
       </Sheet>
     </div>
