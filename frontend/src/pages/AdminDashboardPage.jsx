@@ -444,6 +444,189 @@ export default function AdminDashboardPage({ user, onLogout }) {
     }
   };
 
+  // ============ Module Functions ============
+  const openModuleCreate = () => {
+    setSheetType('module');
+    setIsEditMode(false);
+    setEditingItem(null);
+    setModuleForm({ title: "", description: "", order: modules.length + 1 });
+    setIsSheetOpen(true);
+  };
+
+  const openModuleEdit = (module) => {
+    setSheetType('module');
+    setIsEditMode(true);
+    setEditingItem(module);
+    setModuleForm({
+      title: module.title,
+      description: module.description,
+      order: module.order
+    });
+    setIsSheetOpen(true);
+  };
+
+  const handleModuleSubmit = async () => {
+    if (!moduleForm.title.trim()) {
+      toast.error("Введите название модуля");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      if (isEditMode && editingItem) {
+        const response = await axios.put(`${API}/admin/modules/${editingItem.id}`, {
+          title: moduleForm.title,
+          description: moduleForm.description,
+          order: moduleForm.order
+        });
+        setModules(modules.map(m => m.id === editingItem.id ? response.data : m));
+        toast.success("Модуль обновлён");
+      } else {
+        const response = await axios.post(`${API}/admin/modules`, {
+          title: moduleForm.title,
+          description: moduleForm.description,
+          order: moduleForm.order
+        });
+        setModules([...modules, response.data]);
+        toast.success("Модуль добавлен");
+      }
+      closeSheet();
+    } catch (error) {
+      const message = error.response?.data?.detail || "Ошибка сохранения";
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleModuleDelete = async () => {
+    if (!editingItem) return;
+    
+    if (!window.confirm("Удалить этот модуль и все его уроки?")) return;
+
+    setIsSubmitting(true);
+    try {
+      await axios.delete(`${API}/admin/modules/${editingItem.id}`);
+      setModules(modules.filter(m => m.id !== editingItem.id));
+      setLessons(lessons.filter(l => l.module_id !== editingItem.id));
+      toast.success("Модуль удалён");
+      closeSheet();
+    } catch (error) {
+      toast.error("Ошибка удаления");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // ============ Lesson Functions ============
+  const fetchModuleLessons = async (moduleId) => {
+    try {
+      const response = await axios.get(`${API}/admin/modules/${moduleId}/lessons`);
+      setLessons(response.data);
+    } catch (error) {
+      toast.error("Ошибка загрузки уроков");
+    }
+  };
+
+  const openLessonCreate = (module) => {
+    setSelectedModuleForLesson(module);
+    setIsLessonEditMode(false);
+    setEditingLesson(null);
+    const moduleLessons = lessons.filter(l => l.module_id === module.id);
+    setLessonForm({ 
+      title: "", 
+      description: "", 
+      content: "", 
+      duration_minutes: 30, 
+      order: moduleLessons.length + 1 
+    });
+    setLessonModalTab("description");
+    setIsLessonModalOpen(true);
+  };
+
+  const openLessonEdit = async (lesson, module) => {
+    setSelectedModuleForLesson(module);
+    setIsLessonEditMode(true);
+    setEditingLesson(lesson);
+    setLessonForm({
+      title: lesson.title,
+      description: lesson.description,
+      content: lesson.content,
+      duration_minutes: lesson.duration_minutes,
+      order: lesson.order
+    });
+    setLessonModalTab("description");
+    setIsLessonModalOpen(true);
+  };
+
+  const handleLessonSubmit = async () => {
+    if (!lessonForm.title.trim()) {
+      toast.error("Введите название урока");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      if (isLessonEditMode && editingLesson) {
+        const response = await axios.put(`${API}/admin/lessons/${editingLesson.id}`, {
+          title: lessonForm.title,
+          description: lessonForm.description,
+          content: lessonForm.content,
+          duration_minutes: lessonForm.duration_minutes,
+          order: lessonForm.order
+        });
+        setLessons(lessons.map(l => l.id === editingLesson.id ? response.data : l));
+        // Update module lessons count
+        const modulesRes = await axios.get(`${API}/admin/modules`);
+        setModules(modulesRes.data);
+        toast.success("Урок обновлён");
+      } else {
+        const response = await axios.post(`${API}/admin/lessons`, {
+          module_id: selectedModuleForLesson.id,
+          title: lessonForm.title,
+          description: lessonForm.description,
+          content: lessonForm.content,
+          duration_minutes: lessonForm.duration_minutes,
+          order: lessonForm.order
+        });
+        setLessons([...lessons, response.data]);
+        // Update module lessons count
+        const modulesRes = await axios.get(`${API}/admin/modules`);
+        setModules(modulesRes.data);
+        toast.success("Урок добавлен");
+      }
+      setIsLessonModalOpen(false);
+    } catch (error) {
+      const message = error.response?.data?.detail || "Ошибка сохранения";
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleLessonDelete = async () => {
+    if (!editingLesson) return;
+    
+    if (!window.confirm("Удалить этот урок?")) return;
+
+    setIsSubmitting(true);
+    try {
+      await axios.delete(`${API}/admin/lessons/${editingLesson.id}`);
+      setLessons(lessons.filter(l => l.id !== editingLesson.id));
+      // Update module lessons count
+      const modulesRes = await axios.get(`${API}/admin/modules`);
+      setModules(modulesRes.data);
+      toast.success("Урок удалён");
+      setIsLessonModalOpen(false);
+    } catch (error) {
+      toast.error("Ошибка удаления");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   // ============ Common Functions ============
   const closeSheet = () => {
     setIsSheetOpen(false);
