@@ -348,6 +348,88 @@ def generate_password(length=10):
 async def root():
     return {"message": "Onboarding API"}
 
+# ============ File Upload Routes ============
+
+@api_router.post("/upload")
+async def upload_file(file: UploadFile = File(...), file_type: str = "image"):
+    """
+    Upload a file (image or document).
+    file_type: 'image' for avatars, 'document' for documents
+    Returns: {"url": "/api/uploads/filename.ext", "filename": "filename.ext"}
+    """
+    # Check file size
+    file.file.seek(0, 2)  # Move to end
+    file_size = file.file.tell()
+    file.file.seek(0)  # Reset to beginning
+    
+    if file_size > MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"Файл слишком большой. Максимальный размер: {MAX_FILE_SIZE // (1024*1024)} МБ"
+        )
+    
+    # Get file extension
+    original_filename = file.filename or "file"
+    file_ext = Path(original_filename).suffix.lower()
+    
+    # Validate extension based on type
+    if file_type == "image":
+        if file_ext not in ALLOWED_IMAGE_EXTENSIONS:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Недопустимый формат изображения. Разрешены: {', '.join(ALLOWED_IMAGE_EXTENSIONS)}"
+            )
+    elif file_type == "document":
+        if file_ext not in ALLOWED_DOC_EXTENSIONS:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Недопустимый формат документа. Разрешены: {', '.join(ALLOWED_DOC_EXTENSIONS)}"
+            )
+    
+    # Generate unique filename
+    unique_id = str(uuid.uuid4())[:8]
+    safe_filename = f"{unique_id}{file_ext}"
+    file_path = UPLOAD_DIR / safe_filename
+    
+    # Save file
+    try:
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Ошибка сохранения файла: {str(e)}"
+        )
+    
+    # Return URL
+    file_url = f"/api/uploads/{safe_filename}"
+    return {
+        "url": file_url,
+        "filename": safe_filename,
+        "original_name": original_filename,
+        "size": file_size
+    }
+
+@api_router.get("/uploads/{filename}")
+async def get_uploaded_file(filename: str):
+    """Serve uploaded files"""
+    file_path = UPLOAD_DIR / filename
+    
+    if not file_path.exists():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Файл не найден"
+        )
+    
+    # Security check - prevent directory traversal
+    if not file_path.resolve().parent == UPLOAD_DIR.resolve():
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Доступ запрещён"
+        )
+    
+    return FileResponse(file_path)
+
 @api_router.post("/auth/login", response_model=LoginResponse)
 async def login(request: LoginRequest):
     # Check admin login
