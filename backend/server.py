@@ -75,7 +75,7 @@ class Teacher(BaseModel):
     id: str
     name: str
     email: str
-    status: str  # registered, in_progress, completed
+    status: str  # registered, in_progress, completed, blocked
     avatar_url: Optional[str] = None
     password: Optional[str] = None
     created_at: Optional[str] = None
@@ -83,6 +83,13 @@ class Teacher(BaseModel):
 class TeacherCreate(BaseModel):
     name: str
     email: str
+    avatar_url: Optional[str] = None
+
+class TeacherUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    status: Optional[str] = None
+    avatar_url: Optional[str] = None
 
 class AdminTask(BaseModel):
     id: str
