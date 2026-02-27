@@ -215,6 +215,170 @@ class OnboardingAPITester:
             return True
         return False
 
+    def test_teacher_crud_operations(self):
+        """Test comprehensive teacher CRUD operations"""
+        print("\n🔍 Testing Teacher CRUD Operations...")
+        
+        # 1. Get initial teachers list
+        success, initial_teachers = self.run_test("Get Initial Teachers", "GET", "admin/teachers", 200)
+        if not success:
+            print("❌ Failed to get initial teachers")
+            return False
+        
+        initial_count = len(initial_teachers)
+        print(f"   Initial teacher count: {initial_count}")
+        
+        # 2. Create a new teacher with avatar
+        teacher_data = {
+            "name": "Новый Тестовый Преподаватель",
+            "email": f"test_new_teacher_{datetime.now().strftime('%H%M%S')}@test.ru",
+            "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=NewTest"
+        }
+        
+        success, created_teacher = self.run_test(
+            "Create Teacher with Avatar",
+            "POST",
+            "admin/teachers",
+            200,
+            data=teacher_data
+        )
+        
+        if not success or not created_teacher.get('id'):
+            print("❌ Failed to create teacher")
+            return False
+        
+        teacher_id = created_teacher['id']
+        print(f"   Created teacher ID: {teacher_id}")
+        
+        # 3. Verify teacher was created with correct data
+        success, fetched_teacher = self.run_test(
+            f"Get Created Teacher by ID",
+            "GET", 
+            f"admin/teachers/{teacher_id}",
+            200
+        )
+        
+        if not success:
+            print("❌ Failed to fetch created teacher")
+            return False
+        
+        if (fetched_teacher.get('name') != teacher_data['name'] or
+            fetched_teacher.get('email') != teacher_data['email'] or
+            fetched_teacher.get('avatar_url') != teacher_data['avatar_url']):
+            print("❌ Created teacher data mismatch")
+            return False
+        
+        print("   ✅ Teacher created with correct data")
+        
+        # 4. Test updating teacher with all fields
+        update_data = {
+            "name": "Обновленное Имя Преподавателя",
+            "email": f"updated_{datetime.now().strftime('%H%M%S')}@test.ru",
+            "status": "completed",
+            "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=Updated"
+        }
+        
+        success, updated_teacher = self.run_test(
+            "Update All Teacher Fields",
+            "PUT",
+            f"admin/teachers/{teacher_id}",
+            200,
+            data=update_data
+        )
+        
+        if not success:
+            print("❌ Failed to update teacher")
+            return False
+        
+        # Verify update
+        success, verify_teacher = self.run_test(
+            "Verify Teacher Update",
+            "GET",
+            f"admin/teachers/{teacher_id}",
+            200
+        )
+        
+        if (verify_teacher.get('name') != update_data['name'] or
+            verify_teacher.get('email') != update_data['email'] or
+            verify_teacher.get('status') != update_data['status'] or
+            verify_teacher.get('avatar_url') != update_data['avatar_url']):
+            print("❌ Teacher update verification failed")
+            return False
+        
+        print("   ✅ Teacher update successful")
+        
+        # 5. Test all status options
+        status_options = ["registered", "in_progress", "completed", "blocked"]
+        for status in status_options:
+            success, _ = self.run_test(
+                f"Set Status to '{status}'",
+                "PUT",
+                f"admin/teachers/{teacher_id}",
+                200,
+                data={"status": status}
+            )
+            
+            if not success:
+                print(f"❌ Failed to set status to {status}")
+                return False
+        
+        print("   ✅ All status options work correctly")
+        
+        # 6. Test partial updates
+        partial_update = {"name": "Частичное Обновление Имени"}
+        success, _ = self.run_test(
+            "Partial Name Update",
+            "PUT",
+            f"admin/teachers/{teacher_id}",
+            200,
+            data=partial_update
+        )
+        
+        if not success:
+            print("❌ Failed partial update")
+            return False
+        
+        print("   ✅ Partial update works correctly")
+        
+        # 7. Test error conditions
+        # Test duplicate email
+        duplicate_data = {
+            "name": "Дублированный Email",
+            "email": "test@test.ru",  # Should already exist
+            "avatar_url": "https://api.dicebear.com/7.x/avataaars/svg?seed=Duplicate"
+        }
+        
+        success, _ = self.run_test(
+            "Create Teacher with Duplicate Email",
+            "POST",
+            "admin/teachers",
+            400,  # Should fail
+            data=duplicate_data
+        )
+        
+        if success:  # Should fail, so success means error
+            print("❌ Duplicate email was allowed (should be rejected)")
+            return False
+        
+        print("   ✅ Duplicate email properly rejected")
+        
+        # 8. Test invalid teacher ID
+        success, _ = self.run_test(
+            "Get Non-existent Teacher",
+            "GET",
+            "admin/teachers/invalid-id-12345",
+            404
+        )
+        
+        if success:  # Should fail with 404
+            print("❌ Invalid teacher ID should return 404")
+            return False
+        
+        print("   ✅ Invalid teacher ID properly returns 404")
+        
+        print("\n✅ All Teacher CRUD operations passed!")
+        return True
+
 def main():
     print("🚀 Starting Onboarding API Tests (including Admin Panel)")
     print("=" * 60)
