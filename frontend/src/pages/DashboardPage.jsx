@@ -313,10 +313,23 @@ export default function DashboardPage({ user, onLogout }) {
                     <div className={`document-icon ${typeColors.bg} ${typeColors.text}`}>
                       {doc.file_type}
                     </div>
-                    <div className="document-content">
+                    <div className="document-content flex-1">
                       <h4 className="document-title">{doc.title}</h4>
                       <p className="document-description">{doc.description}</p>
                     </div>
+                    {doc.download_url && (
+                      <a
+                        href={doc.download_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+                        onClick={(e) => e.stopPropagation()}
+                        title="Открыть документ"
+                        data-testid={`doc-link-${doc.id}`}
+                      >
+                        <ExternalLink className="w-5 h-5 text-gray-600" />
+                      </a>
+                    )}
                   </div>
                 );
               })}
