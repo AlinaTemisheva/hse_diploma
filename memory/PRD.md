@@ -26,6 +26,12 @@
 
 ## What's Been Implemented
 
+### Feb 27, 2026 - User ID Bug Fix
+- ✅ Fixed user_id passing from login to all API endpoints
+- ✅ User ID stored in localStorage as 'onboarding_user_id'
+- ✅ All endpoints receive correct user_id parameter
+- ✅ Different users see their own progress
+
 ### Feb 27, 2026 - MongoDB Migration & Lesson Progress
 - ✅ Full migration from in-memory to MongoDB
 - ✅ Collections: teachers, tasks, documents, modules, lessons, lesson_progress, task_states
