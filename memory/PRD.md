@@ -77,7 +77,12 @@
 - [x] File upload backend (POST /api/upload, GET /api/uploads/{filename})
 - [x] Connect frontend file uploads to backend (avatars, documents)
 
-### P2 (Enhancements)
+### P2 (Completed)
+- [x] Progress persistence in MongoDB
+- [x] Lesson completion tracking per user
+- [x] Content versioning (snapshot on completion)
+
+### P3 (Enhancements)
 - [ ] Progress persistence in MongoDB
 - [ ] Course/lesson completion tracking per user
 - [ ] Real JWT authentication
