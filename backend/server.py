@@ -136,6 +136,49 @@ class AdminDocument(BaseModel):
     description: str
     file_type: str
 
+# ============ Module and Lesson Models ============
+
+class Lesson(BaseModel):
+    id: str
+    module_id: str
+    title: str
+    description: str
+    content: str  # HTML content from WYSIWYG editor
+    duration_minutes: int = 30
+    order: int = 1
+    
+class LessonCreate(BaseModel):
+    module_id: str
+    title: str
+    description: str = ""
+    content: str = ""
+    duration_minutes: int = 30
+    order: int = 1
+
+class LessonUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    content: Optional[str] = None
+    duration_minutes: Optional[int] = None
+    order: Optional[int] = None
+
+class Module(BaseModel):
+    id: str
+    title: str
+    description: str
+    order: int = 1
+    lessons_count: int = 0
+    
+class ModuleCreate(BaseModel):
+    title: str
+    description: str = ""
+    order: int = 1
+
+class ModuleUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    order: Optional[int] = None
+
 # ============ Mock Data ============
 
 # Regular user
