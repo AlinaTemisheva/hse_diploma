@@ -796,26 +796,115 @@ export default function AdminDashboardPage({ user, onLogout }) {
       case "courses":
         return (
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-6 font-heading">Уроки</h1>
-            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-4 px-6 text-sm font-medium text-gray-500">Модуль</th>
-                    <th className="text-left py-4 px-6 text-sm font-medium text-gray-500">Название</th>
-                    <th className="text-left py-4 px-6 text-sm font-medium text-gray-500">Длительность</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {courses.map((course) => (
-                    <tr key={course.id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50">
-                      <td className="py-4 px-6 text-gray-500">{course.module_number}</td>
-                      <td className="py-4 px-6 font-medium text-gray-900">{course.title}</td>
-                      <td className="py-4 px-6 text-gray-600">{course.duration}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="flex items-center justify-between mb-6">
+              <h1 className="text-3xl font-bold text-gray-900 font-heading">Модули и уроки</h1>
+              <Button 
+                onClick={openModuleCreate}
+                className="bg-[#1B318E] hover:bg-[#152570] text-white px-6"
+                data-testid="add-module-btn"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Добавить модуль
+              </Button>
+            </div>
+            
+            <div className="space-y-4">
+              {modules.map((module) => {
+                const moduleLessons = lessons.filter(l => l.module_id === module.id);
+                return (
+                  <div key={module.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden" data-testid={`module-${module.id}`}>
+                    {/* Module Header */}
+                    <div 
+                      className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors"
+                      onClick={() => {
+                        // Expand/collapse lessons
+                        if (moduleLessons.length === 0) {
+                          fetchModuleLessons(module.id);
+                        }
+                      }}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center">
+                          <GraduationCap className="w-6 h-6 text-purple-600" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-gray-900">Модуль {module.order}. {module.title}</h3>
+                          <p className="text-sm text-gray-500">{module.lessons_count} уроков</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => { e.stopPropagation(); openLessonCreate(module); }}
+                          className="text-[#1B318E] border-[#1B318E]/20 hover:bg-[#1B318E]/5"
+                          data-testid={`add-lesson-btn-${module.id}`}
+                        >
+                          <Plus className="w-4 h-4 mr-1" />
+                          Урок
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => { e.stopPropagation(); openModuleEdit(module); }}
+                          data-testid={`edit-module-btn-${module.id}`}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    {/* Lessons List */}
+                    {moduleLessons.length > 0 && (
+                      <div className="border-t border-gray-100">
+                        {moduleLessons.map((lesson) => (
+                          <div 
+                            key={lesson.id}
+                            className="px-4 py-3 pl-20 flex items-center justify-between hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-0"
+                            onClick={() => openLessonEdit(lesson, module)}
+                            data-testid={`lesson-${lesson.id}`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm font-medium text-gray-600">
+                                {lesson.order}
+                              </div>
+                              <div>
+                                <p className="font-medium text-gray-900">{lesson.title}</p>
+                                <p className="text-sm text-gray-500">{lesson.description}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-gray-500">
+                              <Clock className="w-4 h-4" />
+                              {lesson.duration_minutes} мин
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {/* Load lessons button if not loaded */}
+                    {module.lessons_count > 0 && moduleLessons.length === 0 && (
+                      <div className="border-t border-gray-100 p-3 text-center">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => fetchModuleLessons(module.id)}
+                          className="text-gray-500"
+                        >
+                          Загрузить уроки ({module.lessons_count})
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+              
+              {modules.length === 0 && (
+                <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
+                  <GraduationCap className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-gray-500">Модули пока не добавлены</p>
+                </div>
+              )}
             </div>
           </div>
         );
