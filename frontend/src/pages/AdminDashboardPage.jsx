@@ -144,6 +144,9 @@ export default function AdminDashboardPage({ user, onLogout }) {
     order: 1
   });
   
+  // Editor mode: 'visual' or 'html'
+  const [editorMode, setEditorMode] = useState('visual');
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Pagination
