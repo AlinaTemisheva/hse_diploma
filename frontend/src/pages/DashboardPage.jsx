@@ -49,9 +49,16 @@ export default function DashboardPage({ user, onLogout }) {
   const [courses, setCourses] = useState([]);
   const [documents, setDocuments] = useState([]);
   const [services, setServices] = useState([]);
+  const [modules, setModules] = useState([]);
   const [stats, setStats] = useState({ tasks_completed: 2, tasks_total: 5, courses_completed: 2, courses_total: 6 });
   const [activeTab, setActiveTab] = useState("tasks");
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Lesson modal states
+  const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
+  const [selectedModule, setSelectedModule] = useState(null);
+  const [moduleLessons, setModuleLessons] = useState([]);
+  const [selectedLesson, setSelectedLesson] = useState(null);
 
   useEffect(() => {
     fetchData();
