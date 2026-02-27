@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { 
   Users, 
@@ -11,7 +12,9 @@ import {
   FileText,
   Plus,
   LogOut,
-  X
+  X,
+  Upload,
+  Check
 } from "lucide-react";
 import axios from "axios";
 
@@ -26,18 +29,44 @@ const MENU_ITEMS = [
   { id: "documents", label: "Документы", icon: FileText },
 ];
 
-// Status labels
+// Status options
+const STATUS_OPTIONS = [
+  { value: "registered", label: "Зарегистрирован" },
+  { value: "in_progress", label: "В процессе" },
+  { value: "completed", label: "Завершено обучение" },
+  { value: "blocked", label: "Заблокирован" },
+];
+
+// Status labels and styles
 const STATUS_LABELS = {
   registered: "Зарегистрирован",
   in_progress: "В процессе",
-  completed: "Завершено"
+  completed: "Завершено обучение",
+  blocked: "Заблокирован"
 };
 
 const STATUS_STYLES = {
   registered: "bg-gray-100 text-gray-700",
   in_progress: "bg-blue-50 text-blue-700",
-  completed: "bg-gray-900 text-white"
+  completed: "bg-green-50 text-green-700",
+  blocked: "bg-red-50 text-red-700"
 };
+
+// Avatar options for selection
+const AVATAR_OPTIONS = [
+  { id: 1, url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" },
+  { id: 2, url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka" },
+  { id: 3, url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Max" },
+  { id: 4, url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Luna" },
+  { id: 5, url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Leo" },
+  { id: 6, url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sophie" },
+  { id: 7, url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Oliver" },
+  { id: 8, url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Emma" },
+  { id: 9, url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jack" },
+  { id: 10, url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Mia" },
+  { id: 11, url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Noah" },
+  { id: 12, url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Ava" },
+];
 
 export default function AdminDashboardPage({ user, onLogout }) {
   const [activeMenu, setActiveMenu] = useState("teachers");
@@ -46,8 +75,21 @@ export default function AdminDashboardPage({ user, onLogout }) {
   const [courses, setCourses] = useState([]);
   const [documents, setDocuments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Sheet states
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [newTeacher, setNewTeacher] = useState({ name: "", email: "" });
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingTeacher, setEditingTeacher] = useState(null);
+  
+  // Form states
+  const [formData, setFormData] = useState({ 
+    name: "", 
+    email: "", 
+    status: "in_progress",
+    avatar_url: "" 
+  });
+  const [selectedAvatar, setSelectedAvatar] = useState(null);
+  const [customAvatarUrl, setCustomAvatarUrl] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -76,24 +118,107 @@ export default function AdminDashboardPage({ user, onLogout }) {
     }
   };
 
-  const handleAddTeacher = async () => {
-    if (!newTeacher.name.trim() || !newTeacher.email.trim()) {
-      toast.error("Заполните все поля");
+  const openCreateSheet = () => {
+    setIsEditMode(false);
+    setEditingTeacher(null);
+    setFormData({ name: "", email: "", status: "in_progress", avatar_url: "" });
+    setSelectedAvatar(null);
+    setCustomAvatarUrl("");
+    setIsSheetOpen(true);
+  };
+
+  const openEditSheet = (teacher) => {
+    setIsEditMode(true);
+    setEditingTeacher(teacher);
+    setFormData({
+      name: teacher.name,
+      email: teacher.email,
+      status: teacher.status,
+      avatar_url: teacher.avatar_url
+    });
+    // Check if current avatar is in options
+    const existingAvatar = AVATAR_OPTIONS.find(a => a.url === teacher.avatar_url);
+    if (existingAvatar) {
+      setSelectedAvatar(existingAvatar.id);
+      setCustomAvatarUrl("");
+    } else {
+      setSelectedAvatar(null);
+      setCustomAvatarUrl(teacher.avatar_url || "");
+    }
+    setIsSheetOpen(true);
+  };
+
+  const closeSheet = () => {
+    setIsSheetOpen(false);
+    setIsEditMode(false);
+    setEditingTeacher(null);
+    setFormData({ name: "", email: "", status: "in_progress", avatar_url: "" });
+    setSelectedAvatar(null);
+    setCustomAvatarUrl("");
+  };
+
+  const getAvatarUrl = () => {
+    if (selectedAvatar) {
+      return AVATAR_OPTIONS.find(a => a.id === selectedAvatar)?.url || "";
+    }
+    if (customAvatarUrl) {
+      return customAvatarUrl;
+    }
+    return "";
+  };
+
+  const handleSubmit = async () => {
+    if (!formData.name.trim() || !formData.email.trim()) {
+      toast.error("Заполните все обязательные поля");
       return;
     }
 
     setIsSubmitting(true);
+    const avatarUrl = getAvatarUrl();
+
     try {
-      const response = await axios.post(`${API}/admin/teachers`, newTeacher);
-      setTeachers([...teachers, response.data]);
-      setNewTeacher({ name: "", email: "" });
-      setIsSheetOpen(false);
-      toast.success("Преподаватель добавлен");
+      if (isEditMode && editingTeacher) {
+        // Update existing teacher
+        const response = await axios.put(`${API}/admin/teachers/${editingTeacher.id}`, {
+          name: formData.name,
+          email: formData.email,
+          status: formData.status,
+          avatar_url: avatarUrl || undefined
+        });
+        
+        setTeachers(teachers.map(t => 
+          t.id === editingTeacher.id ? response.data : t
+        ));
+        toast.success("Преподаватель обновлён");
+      } else {
+        // Create new teacher
+        const response = await axios.post(`${API}/admin/teachers`, {
+          name: formData.name,
+          email: formData.email,
+          avatar_url: avatarUrl || undefined
+        });
+        setTeachers([...teachers, response.data]);
+        toast.success("Преподаватель добавлен");
+      }
+      closeSheet();
     } catch (error) {
-      const message = error.response?.data?.detail || "Ошибка добавления";
+      const message = error.response?.data?.detail || "Ошибка сохранения";
       toast.error(message);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // For demo, we'll create a data URL. In production, you'd upload to server
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setCustomAvatarUrl(event.target?.result);
+        setSelectedAvatar(null);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -113,7 +238,7 @@ export default function AdminDashboardPage({ user, onLogout }) {
             <div className="flex items-center justify-between mb-6">
               <h1 className="text-3xl font-bold text-gray-900 font-heading">Преподаватели</h1>
               <Button 
-                onClick={() => setIsSheetOpen(true)}
+                onClick={openCreateSheet}
                 className="bg-[#1B318E] hover:bg-[#152570] text-white px-6"
                 data-testid="add-teacher-btn"
               >
@@ -135,14 +260,19 @@ export default function AdminDashboardPage({ user, onLogout }) {
                 </thead>
                 <tbody>
                   {teachers.map((teacher) => (
-                    <tr key={teacher.id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50" data-testid={`teacher-row-${teacher.id}`}>
+                    <tr 
+                      key={teacher.id} 
+                      className="border-b border-gray-100 last:border-0 hover:bg-gray-50 cursor-pointer transition-colors" 
+                      onClick={() => openEditSheet(teacher)}
+                      data-testid={`teacher-row-${teacher.id}`}
+                    >
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
                           {teacher.avatar_url ? (
                             <img 
                               src={teacher.avatar_url} 
                               alt={teacher.name}
-                              className="w-10 h-10 rounded-full bg-gray-200"
+                              className="w-10 h-10 rounded-full bg-gray-200 object-cover"
                             />
                           ) : (
                             <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-medium text-gray-600">
@@ -317,13 +447,15 @@ export default function AdminDashboardPage({ user, onLogout }) {
         {renderContent()}
       </main>
 
-      {/* Add Teacher Sheet */}
+      {/* Add/Edit Teacher Sheet */}
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-        <SheetContent className="w-full sm:max-w-md flex flex-col">
+        <SheetContent className="w-full sm:max-w-lg flex flex-col overflow-y-auto">
           <SheetHeader className="flex-row items-center justify-between space-y-0 pb-6">
-            <SheetTitle className="text-xl font-semibold">Добавление преподавателя</SheetTitle>
+            <SheetTitle className="text-xl font-semibold">
+              {isEditMode ? "Редактирование преподавателя" : "Добавление преподавателя"}
+            </SheetTitle>
             <button 
-              onClick={() => setIsSheetOpen(false)}
+              onClick={closeSheet}
               className="text-gray-400 hover:text-gray-600"
             >
               <X className="w-5 h-5" />
@@ -331,38 +463,132 @@ export default function AdminDashboardPage({ user, onLogout }) {
           </SheetHeader>
           
           <div className="flex-1 space-y-6">
+            {/* Avatar Selection */}
+            <div className="space-y-3">
+              <Label className="text-base font-medium">Аватар</Label>
+              
+              {/* Current/Selected Avatar Preview */}
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-20 h-20 rounded-full bg-gray-100 overflow-hidden border-2 border-gray-200">
+                  {(selectedAvatar || customAvatarUrl) ? (
+                    <img 
+                      src={getAvatarUrl()} 
+                      alt="Avatar"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : formData.name ? (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-600 text-xl font-medium">
+                      {getInitials(formData.name)}
+                    </div>
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400">
+                      <Users className="w-8 h-8" />
+                    </div>
+                  )}
+                </div>
+                
+                {/* Upload Button */}
+                <div>
+                  <label className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                    <Upload className="w-4 h-4" />
+                    <span className="text-sm">Загрузить фото</span>
+                    <input 
+                      type="file" 
+                      accept="image/*"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                      data-testid="avatar-upload"
+                    />
+                  </label>
+                </div>
+              </div>
+              
+              {/* Avatar Options Grid */}
+              <div className="grid grid-cols-6 gap-2">
+                {AVATAR_OPTIONS.map((avatar) => (
+                  <button
+                    key={avatar.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedAvatar(avatar.id);
+                      setCustomAvatarUrl("");
+                    }}
+                    className={`relative w-12 h-12 rounded-full overflow-hidden border-2 transition-all ${
+                      selectedAvatar === avatar.id 
+                        ? "border-[#1B318E] ring-2 ring-[#1B318E]/20" 
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                    data-testid={`avatar-option-${avatar.id}`}
+                  >
+                    <img src={avatar.url} alt={`Avatar ${avatar.id}`} className="w-full h-full" />
+                    {selectedAvatar === avatar.id && (
+                      <div className="absolute inset-0 bg-[#1B318E]/20 flex items-center justify-center">
+                        <Check className="w-4 h-4 text-[#1B318E]" />
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Name Field */}
             <div className="space-y-2">
-              <Label htmlFor="teacher-name" className="text-base font-medium">ФИО</Label>
+              <Label htmlFor="teacher-name" className="text-base font-medium">ФИО *</Label>
               <Input
                 id="teacher-name"
-                value={newTeacher.name}
-                onChange={(e) => setNewTeacher({ ...newTeacher, name: e.target.value })}
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="h-12 rounded-lg border-gray-200"
                 placeholder="Иванов Иван Иванович"
                 data-testid="teacher-name-input"
               />
             </div>
             
+            {/* Email Field */}
             <div className="space-y-2">
-              <Label htmlFor="teacher-email" className="text-base font-medium">Email</Label>
+              <Label htmlFor="teacher-email" className="text-base font-medium">Email *</Label>
               <Input
                 id="teacher-email"
                 type="email"
-                value={newTeacher.email}
-                onChange={(e) => setNewTeacher({ ...newTeacher, email: e.target.value })}
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 className="h-12 rounded-lg border-gray-200"
                 placeholder="email@hse.ru"
                 data-testid="teacher-email-input"
               />
-              <p className="text-sm text-gray-500 leading-relaxed">
-                Пароль от личного кабинета будет сформирован автоматически и отправлен на почту в приглашении
-              </p>
+              {!isEditMode && (
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  Пароль от личного кабинета будет сформирован автоматически и отправлен на почту в приглашении
+                </p>
+              )}
             </div>
+
+            {/* Status Field (only in edit mode) */}
+            {isEditMode && (
+              <div className="space-y-2">
+                <Label className="text-base font-medium">Статус</Label>
+                <Select 
+                  value={formData.status} 
+                  onValueChange={(value) => setFormData({ ...formData, status: value })}
+                >
+                  <SelectTrigger className="h-12 rounded-lg border-gray-200" data-testid="status-select">
+                    <SelectValue placeholder="Выберите статус" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {STATUS_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
 
           <SheetFooter className="flex-col gap-3 mt-auto pt-6">
             <Button
-              onClick={handleAddTeacher}
+              onClick={handleSubmit}
               disabled={isSubmitting}
               className="w-full h-12 bg-[#1B318E] hover:bg-[#152570] text-white rounded-lg"
               data-testid="save-teacher-btn"
@@ -371,7 +597,7 @@ export default function AdminDashboardPage({ user, onLogout }) {
             </Button>
             <Button
               variant="outline"
-              onClick={() => setIsSheetOpen(false)}
+              onClick={closeSheet}
               className="w-full h-12 rounded-lg border-gray-200"
               data-testid="close-sheet-btn"
             >
