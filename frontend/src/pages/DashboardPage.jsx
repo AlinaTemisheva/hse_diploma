@@ -112,8 +112,39 @@ export default function DashboardPage({ user, onLogout }) {
       // Always fetch fresh data from server
       const response = await axios.get(`${API}/lessons/${lesson.id}`);
       setSelectedLesson(response.data);
+      
+      // Mark as in_progress if not started
+      if (!lesson.progress_status || lesson.progress_status === "not_started") {
+        await axios.put(`${API}/lessons/${lesson.id}/progress`, { status: "in_progress" });
+        // Update local state
+        setModuleLessons(prev => prev.map(l => 
+          l.id === lesson.id ? { ...l, progress_status: "in_progress" } : l
+        ));
+      }
     } catch (error) {
       toast.error("Ошибка загрузки урока");
+    }
+  };
+
+  const markLessonComplete = async () => {
+    if (!selectedLesson) return;
+    
+    try {
+      await axios.put(`${API}/lessons/${selectedLesson.id}/progress`, { status: "completed" });
+      
+      // Update local state
+      setSelectedLesson(prev => ({ ...prev, progress_status: "completed" }));
+      setModuleLessons(prev => prev.map(l => 
+        l.id === selectedLesson.id ? { ...l, progress_status: "completed" } : l
+      ));
+      
+      // Refresh stats
+      const statsRes = await axios.get(`${API}/user/stats`);
+      setStats(statsRes.data);
+      
+      toast.success("Урок отмечен как пройденный!");
+    } catch (error) {
+      toast.error("Ошибка сохранения прогресса");
     }
   };
 
