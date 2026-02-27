@@ -153,12 +153,13 @@ teachers_db = [
     )
 ]
 
-MOCK_TASKS = [
-    Task(id="1", title="Заведите страницу преподавателя", description="Что, зачем и где сделать", completed=False),
-    Task(id="2", title="Составьте структуру курса в ЛМС", description="Что, зачем и где сделать", completed=False),
-    Task(id="3", title="Составьте ведомость", description="Что, зачем и где сделать", completed=False),
-    Task(id="4", title="Загрузите материалы курса", description="Что, зачем и где сделать", completed=True),
-    Task(id="5", title="Настройте оценивание", description="Что, зачем и где сделать", completed=True),
+# Tasks list (mutable)
+tasks_db = [
+    Task(id="1", title="Заведите страницу преподавателя", description="Что, зачем и где сделать", order=1, completed=False),
+    Task(id="2", title="Составьте структуру курса в ЛМС", description="Что, зачем и где сделать", order=2, completed=False),
+    Task(id="3", title="Составьте ведомость", description="Что, зачем и где сделать", order=3, completed=False),
+    Task(id="4", title="Загрузите материалы курса", description="Что, зачем и где сделать", order=4, completed=True),
+    Task(id="5", title="Настройте оценивание", description="Что, зачем и где сделать", order=5, completed=True),
 ]
 
 MOCK_COURSES = [
