@@ -70,6 +70,21 @@ class Document(BaseModel):
     description: str
     file_type: str  # doc, xls, pdf, zip
     download_url: Optional[str] = None
+    order: int = 0
+
+class DocumentCreate(BaseModel):
+    title: str
+    description: str
+    file_type: str = "doc"
+    download_url: Optional[str] = None
+    order: int = 0
+
+class DocumentUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    file_type: Optional[str] = None
+    download_url: Optional[str] = None
+    order: Optional[int] = None
 
 class Service(BaseModel):
     id: str
