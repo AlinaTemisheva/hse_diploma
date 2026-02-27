@@ -89,6 +89,6 @@
 - Shadcn/UI components at /app/frontend/src/components/ui/
 
 ## Next Tasks
-1. Implement backend for file uploads (POST /api/upload)
-2. Persist data in MongoDB instead of in-memory
-3. Add lesson completion tracking
+1. Persist data in MongoDB instead of in-memory
+2. Add lesson completion tracking per user
+3. Real JWT authentication
