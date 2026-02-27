@@ -26,6 +26,16 @@
 
 ## What's Been Implemented
 
+### Feb 27, 2026 - File Upload Feature
+- ✅ Backend: POST /api/upload endpoint (images + documents)
+- ✅ Backend: GET /api/uploads/{filename} for serving files
+- ✅ File size limit: 10 MB
+- ✅ Allowed images: .jpg, .jpeg, .png, .gif, .webp
+- ✅ Allowed documents: .doc, .docx, .xls, .xlsx, .pdf, .zip, .ppt, .pptx
+- ✅ Frontend: Avatar upload connected to real API
+- ✅ Frontend: Document upload connected to real API
+- ✅ Files stored in /app/uploads/
+
 ### Feb 27, 2026 - Modules & Lessons Feature
 - ✅ Full CRUD for Modules in admin panel (side-page form)
 - ✅ Full CRUD for Lessons with WYSIWYG editor (react-quill-new)
