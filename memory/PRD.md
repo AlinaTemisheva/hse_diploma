@@ -30,8 +30,10 @@
 - ✅ Full CRUD for Modules in admin panel (side-page form)
 - ✅ Full CRUD for Lessons with WYSIWYG editor (react-quill-new)
 - ✅ Lesson modal with tabs (Description / Content)
+- ✅ **Editor mode toggle: Visual (WYSIWYG) / HTML code**
 - ✅ Teacher view: modules list in Learning tab
 - ✅ Teacher view: lessons list in modal with content display
+- ✅ **Real-time sync: teacher sees updated content immediately**
 - ✅ API endpoints: /api/admin/modules, /api/admin/lessons, /api/modules (public)
 
 ### Feb 24, 2026 - Admin Panel & Teacher Dashboard
