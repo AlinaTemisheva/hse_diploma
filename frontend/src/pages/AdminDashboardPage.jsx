@@ -903,13 +903,10 @@ export default function AdminDashboardPage({ user, onLogout }) {
     if (sheetType === 'document') {
       return (
         <>
-          <SheetHeader className="flex-row items-center justify-between space-y-0 pb-6">
+          <SheetHeader className="pb-6">
             <SheetTitle className="text-xl font-semibold">
               {isEditMode ? "Редактирование документа" : "Добавление документа"}
             </SheetTitle>
-            <button onClick={closeSheet} className="text-gray-400 hover:text-gray-600">
-              <X className="w-5 h-5" />
-            </button>
           </SheetHeader>
           
           <div className="flex-1 space-y-6 overflow-y-auto">
@@ -944,14 +941,53 @@ export default function AdminDashboardPage({ user, onLogout }) {
               </Select>
             </div>
 
-            {/* Download URL */}
-            <div className="space-y-2">
-              <Label className="text-base font-medium">Ссылка на файл</Label>
+            {/* File Upload or URL */}
+            <div className="space-y-3">
+              <Label className="text-base font-medium">Файл</Label>
+              
+              {/* File Upload */}
+              <div className="border-2 border-dashed border-gray-200 rounded-lg p-4 text-center hover:border-gray-300 transition-colors">
+                <label className="cursor-pointer block">
+                  <Upload className="w-8 h-8 mx-auto text-gray-400 mb-2" />
+                  <span className="text-sm text-gray-600 block">Нажмите для загрузки файла</span>
+                  <span className="text-xs text-gray-400">или перетащите файл сюда</span>
+                  <input 
+                    type="file" 
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        // For demo: create data URL. In production: upload to server
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                          setDocForm({ 
+                            ...docForm, 
+                            download_url: event.target?.result,
+                            file_type: file.name.split('.').pop()?.toLowerCase() || docForm.file_type
+                          });
+                        };
+                        reader.readAsDataURL(file);
+                        toast.success(`Файл "${file.name}" загружен`);
+                      }
+                    }}
+                    data-testid="doc-file-upload"
+                  />
+                </label>
+              </div>
+              
+              {/* Or divider */}
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-px bg-gray-200"></div>
+                <span className="text-sm text-gray-400">или</span>
+                <div className="flex-1 h-px bg-gray-200"></div>
+              </div>
+              
+              {/* URL Input */}
               <Input
                 value={docForm.download_url}
                 onChange={(e) => setDocForm({ ...docForm, download_url: e.target.value })}
                 className="h-12 rounded-lg border-gray-200"
-                placeholder="https://..."
+                placeholder="Вставьте ссылку на файл"
                 data-testid="doc-url-input"
               />
               <p className="text-sm text-gray-500">
