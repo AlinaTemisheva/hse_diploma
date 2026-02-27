@@ -178,17 +178,19 @@ export default function AdminDashboardPage({ user, onLogout }) {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const [teachersRes, tasksRes, coursesRes, docsRes] = await Promise.all([
+      const [teachersRes, tasksRes, coursesRes, docsRes, modulesRes] = await Promise.all([
         axios.get(`${API}/admin/teachers`),
         axios.get(`${API}/admin/tasks`),
         axios.get(`${API}/admin/courses`),
-        axios.get(`${API}/admin/documents`)
+        axios.get(`${API}/admin/documents`),
+        axios.get(`${API}/admin/modules`)
       ]);
       
       setTeachers(teachersRes.data);
       setTasks(tasksRes.data);
       setCourses(coursesRes.data);
       setDocuments(docsRes.data);
+      setModules(modulesRes.data);
     } catch (error) {
       toast.error("Ошибка загрузки данных");
       console.error("Error fetching data:", error);
