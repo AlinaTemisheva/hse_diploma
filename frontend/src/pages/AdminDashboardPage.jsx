@@ -586,31 +586,78 @@ export default function AdminDashboardPage({ user, onLogout }) {
       case "documents":
         return (
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-6 font-heading">Документы</h1>
+            <div className="flex items-center justify-between mb-6">
+              <h1 className="text-3xl font-bold text-gray-900 font-heading">Документы</h1>
+              <Button 
+                onClick={openDocCreate}
+                className="bg-[#1B318E] hover:bg-[#152570] text-white px-6"
+                data-testid="add-doc-btn"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Добавить документ
+              </Button>
+            </div>
+            
             <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-200">
-                    <th className="text-left py-4 px-6 text-sm font-medium text-gray-500">Тип</th>
-                    <th className="text-left py-4 px-6 text-sm font-medium text-gray-500">Название</th>
-                    <th className="text-left py-4 px-6 text-sm font-medium text-gray-500">Описание</th>
+                    <th className="text-left py-4 px-6 text-sm font-medium text-gray-500 w-20">№</th>
+                    <th className="text-left py-4 px-6 text-sm font-medium text-gray-500">Документ</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {documents.map((doc) => (
-                    <tr key={doc.id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50">
-                      <td className="py-4 px-6">
-                        <span className="uppercase text-xs font-semibold px-2 py-1 rounded bg-gray-100 text-gray-600">
-                          {doc.file_type}
-                        </span>
-                      </td>
+                  {paginatedDocs.map((doc) => (
+                    <tr 
+                      key={doc.id} 
+                      className="border-b border-gray-100 last:border-0 hover:bg-gray-50 cursor-pointer transition-colors"
+                      onClick={() => openDocEdit(doc)}
+                      data-testid={`doc-row-${doc.id}`}
+                    >
+                      <td className="py-4 px-6 text-gray-500">{doc.order}</td>
                       <td className="py-4 px-6 font-medium text-gray-900">{doc.title}</td>
-                      <td className="py-4 px-6 text-gray-600 text-sm">{doc.description}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination */}
+            {totalDocPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-6">
+                <button
+                  onClick={() => setDocPage(p => Math.max(1, p - 1))}
+                  disabled={docPage === 1}
+                  className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Назад
+                </button>
+                
+                {[...Array(totalDocPages)].map((_, i) => (
+                  <button
+                    key={i + 1}
+                    onClick={() => setDocPage(i + 1)}
+                    className={`w-10 h-10 rounded-lg text-sm font-medium ${
+                      docPage === i + 1 
+                        ? "bg-[#1B318E] text-white" 
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+                
+                <button
+                  onClick={() => setDocPage(p => Math.min(totalDocPages, p + 1))}
+                  disabled={docPage === totalDocPages}
+                  className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Вперед
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
           </div>
         );
       
