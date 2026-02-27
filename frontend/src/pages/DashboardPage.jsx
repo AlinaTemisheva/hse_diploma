@@ -302,10 +302,14 @@ export default function DashboardPage({ user, onLogout }) {
               Изучите перед началом работы
             </h3>
             <div className="space-y-3">
-              {courses.map((course) => (
-                <div key={course.id} className="course-item" data-testid={`course-${course.id}`}>
+              {modules.map((module) => (
+                <div 
+                  key={module.id} 
+                  className="course-item cursor-pointer hover:shadow-md transition-shadow" 
+                  onClick={() => openModuleLessons(module)}
+                  data-testid={`module-${module.id}`}
+                >
                   <div className="course-image flex items-center justify-center bg-purple-100">
-                    {/* Course illustration placeholder */}
                     <svg viewBox="0 0 80 80" className="w-16 h-16">
                       <circle cx="40" cy="30" r="15" fill="#FFE4C4" />
                       <rect x="25" y="45" width="30" height="25" rx="3" fill="#9333EA" opacity="0.3" />
@@ -314,26 +318,29 @@ export default function DashboardPage({ user, onLogout }) {
                       <path d="M35 35 Q40 38 45 35" fill="none" stroke="#333" strokeWidth="1.5" />
                     </svg>
                   </div>
-                  <div className="course-content">
+                  <div className="course-content flex-1">
                     <h4 className="course-title">
-                      Модуль {course.module_number}. {course.title}
+                      Модуль {module.order}. {module.title}
                     </h4>
-                    <p className="course-description">{course.description}</p>
+                    <p className="course-description">{module.description}</p>
                     <div className="course-meta">
-                      {course.completed && (
-                        <span className="course-status">
-                          <Check size={14} />
-                          Изучено
-                        </span>
-                      )}
-                      <span className="course-duration">
-                        <Clock size={14} />
-                        {course.duration}
+                      <span className="text-sm text-gray-500">
+                        {module.lessons_count} {module.lessons_count === 1 ? 'урок' : module.lessons_count < 5 ? 'урока' : 'уроков'}
                       </span>
                     </div>
                   </div>
+                  <div className="flex-shrink-0">
+                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                  </div>
                 </div>
               ))}
+              
+              {modules.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  <GraduationCap className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+                  <p>Модули пока не добавлены</p>
+                </div>
+              )}
             </div>
           </TabsContent>
 
