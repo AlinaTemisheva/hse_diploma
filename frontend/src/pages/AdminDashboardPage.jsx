@@ -1293,30 +1293,63 @@ export default function AdminDashboardPage({ user, onLogout }) {
                 <label className="cursor-pointer block">
                   <Upload className="w-8 h-8 mx-auto text-gray-400 mb-2" />
                   <span className="text-sm text-gray-600 block">Нажмите для загрузки файла</span>
-                  <span className="text-xs text-gray-400">или перетащите файл сюда</span>
+                  <span className="text-xs text-gray-400">Максимум 10 МБ</span>
                   <input 
                     type="file" 
                     className="hidden"
-                    onChange={(e) => {
+                    accept=".doc,.docx,.xls,.xlsx,.pdf,.zip,.ppt,.pptx"
+                    onChange={async (e) => {
                       const file = e.target.files?.[0];
-                      if (file) {
-                        // For demo: create data URL. In production: upload to server
-                        const reader = new FileReader();
-                        reader.onload = (event) => {
-                          setDocForm({ 
-                            ...docForm, 
-                            download_url: event.target?.result,
-                            file_type: file.name.split('.').pop()?.toLowerCase() || docForm.file_type
-                          });
+                      if (!file) return;
+                      
+                      // Check file size (10 MB)
+                      if (file.size > 10 * 1024 * 1024) {
+                        toast.error("Файл слишком большой. Максимум 10 МБ");
+                        return;
+                      }
+                      
+                      // Upload to server
+                      const formData = new FormData();
+                      formData.append('file', file);
+                      
+                      try {
+                        const response = await axios.post(`${API}/upload?file_type=document`, formData, {
+                          headers: { 'Content-Type': 'multipart/form-data' }
+                        });
+                        
+                        // Get file extension for type
+                        const ext = file.name.split('.').pop()?.toLowerCase();
+                        const typeMap = { 
+                          doc: 'doc', docx: 'doc', 
+                          xls: 'xls', xlsx: 'xls', 
+                          pdf: 'pdf', 
+                          zip: 'zip',
+                          ppt: 'doc', pptx: 'doc'
                         };
-                        reader.readAsDataURL(file);
+                        
+                        setDocForm({ 
+                          ...docForm, 
+                          download_url: `${BACKEND_URL}${response.data.url}`,
+                          file_type: typeMap[ext] || docForm.file_type
+                        });
                         toast.success(`Файл "${file.name}" загружен`);
+                      } catch (error) {
+                        const message = error.response?.data?.detail || "Ошибка загрузки файла";
+                        toast.error(message);
                       }
                     }}
                     data-testid="doc-file-upload"
                   />
                 </label>
               </div>
+              
+              {/* Show uploaded file URL */}
+              {docForm.download_url && docForm.download_url.includes('/api/uploads/') && (
+                <div className="flex items-center gap-2 p-2 bg-green-50 rounded-lg text-sm text-green-700">
+                  <Check className="w-4 h-4" />
+                  Файл загружен на сервер
+                </div>
+              )}
               
               {/* Or divider */}
               <div className="flex items-center gap-3">
