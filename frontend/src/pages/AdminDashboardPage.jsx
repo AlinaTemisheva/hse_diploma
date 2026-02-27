@@ -545,6 +545,7 @@ export default function AdminDashboardPage({ user, onLogout }) {
       order: moduleLessons.length + 1 
     });
     setLessonModalTab("description");
+    setEditorMode('visual');
     setIsLessonModalOpen(true);
   };
 
@@ -560,6 +561,7 @@ export default function AdminDashboardPage({ user, onLogout }) {
       order: lesson.order
     });
     setLessonModalTab("description");
+    setEditorMode('visual');
     setIsLessonModalOpen(true);
   };
 
