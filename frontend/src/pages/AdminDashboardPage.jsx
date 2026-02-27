@@ -114,7 +114,7 @@ export default function AdminDashboardPage({ user, onLogout }) {
               <h1 className="text-3xl font-bold text-gray-900 font-heading">Преподаватели</h1>
               <Button 
                 onClick={() => setIsSheetOpen(true)}
-                className="bg-[#1B318E] hover:bg-[#152570] text-white"
+                className="bg-[#1B318E] hover:bg-[#152570] text-white px-6"
                 data-testid="add-teacher-btn"
               >
                 <Plus className="w-4 h-4 mr-2" />
