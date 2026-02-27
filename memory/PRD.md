@@ -26,6 +26,16 @@
 
 ## What's Been Implemented
 
+### Feb 27, 2026 - MongoDB Migration & Lesson Progress
+- ✅ Full migration from in-memory to MongoDB
+- ✅ Collections: teachers, tasks, documents, modules, lessons, lesson_progress, task_states
+- ✅ Lesson progress tracking: not_started → in_progress → completed
+- ✅ Content versioning: snapshot saved on completion
+- ✅ Completed lessons show saved version with warning banner
+- ✅ Incomplete lessons show current admin content
+- ✅ Progress indicators in UI (checkmark/circle)
+- ✅ "Урок пройден" button to mark completion
+
 ### Feb 27, 2026 - File Upload Feature
 - ✅ Backend: POST /api/upload endpoint (images + documents)
 - ✅ Backend: GET /api/uploads/{filename} for serving files
