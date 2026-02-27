@@ -438,6 +438,8 @@ export default function DashboardPage({ user, userId, onLogout }) {
         if (!open) {
           // Refresh modules when modal closes
           axios.get(`${API}/modules`).then(res => setModules(res.data)).catch(() => {});
+          // Refresh stats
+          axios.get(`${API}/user/stats?user_id=${currentUserId}`).then(res => setStats(res.data)).catch(() => {});
         }
       }}>
         <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden flex flex-col p-0">
