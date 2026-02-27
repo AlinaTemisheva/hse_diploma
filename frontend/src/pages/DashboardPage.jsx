@@ -451,21 +451,51 @@ export default function DashboardPage({ user, onLogout }) {
                     <ChevronRight className="w-5 h-5 text-gray-600 rotate-180" />
                   </button>
                   <DialogTitle className="text-xl font-semibold">{selectedLesson.title}</DialogTitle>
+                  {selectedLesson.progress_status === "completed" && (
+                    <span className="ml-2 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium">
+                      Пройден
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
                   <span className="flex items-center gap-1">
                     <Clock className="w-4 h-4" />
                     {selectedLesson.duration_minutes} мин
                   </span>
+                  {selectedLesson.is_snapshot && (
+                    <span className="flex items-center gap-1 text-amber-600">
+                      <AlertCircle className="w-4 h-4" />
+                      Сохранённая версия
+                    </span>
+                  )}
                 </div>
               </DialogHeader>
               <div className="flex-1 overflow-y-auto p-6">
+                {selectedLesson.is_snapshot && (
+                  <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
+                    Вы видите контент, сохранённый на момент прохождения урока. 
+                    Актуальная версия могла измениться.
+                  </div>
+                )}
                 <div 
                   className="prose prose-sm max-w-none"
                   dangerouslySetInnerHTML={{ __html: selectedLesson.content }}
                   data-testid="lesson-content"
                 />
               </div>
+              {/* Complete button */}
+              {selectedLesson.progress_status !== "completed" && (
+                <div className="p-4 border-t border-gray-100">
+                  <Button
+                    onClick={markLessonComplete}
+                    className="w-full bg-green-600 hover:bg-green-700 text-white"
+                    data-testid="mark-lesson-complete-btn"
+                  >
+                    <CheckCircle2 className="w-4 h-4 mr-2" />
+                    Урок пройден
+                  </Button>
+                </div>
+              )}
             </>
           ) : (
             // Lessons List View
