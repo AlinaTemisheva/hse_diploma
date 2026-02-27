@@ -85,13 +85,22 @@ export default function AdminDashboardPage({ user, onLogout }) {
   const [tasks, setTasks] = useState([]);
   const [courses, setCourses] = useState([]);
   const [documents, setDocuments] = useState([]);
+  const [modules, setModules] = useState([]);
+  const [lessons, setLessons] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   
   // Sheet states
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [sheetType, setSheetType] = useState(null); // 'teacher' | 'task' | 'document'
+  const [sheetType, setSheetType] = useState(null); // 'teacher' | 'task' | 'document' | 'module'
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  
+  // Lesson modal states
+  const [isLessonModalOpen, setIsLessonModalOpen] = useState(false);
+  const [isLessonEditMode, setIsLessonEditMode] = useState(false);
+  const [editingLesson, setEditingLesson] = useState(null);
+  const [selectedModuleForLesson, setSelectedModuleForLesson] = useState(null);
+  const [lessonModalTab, setLessonModalTab] = useState("description");
   
   // Teacher form states
   const [teacherForm, setTeacherForm] = useState({ 
@@ -118,6 +127,22 @@ export default function AdminDashboardPage({ user, onLogout }) {
     download_url: "",
     order: 1
   });
+
+  // Module form states
+  const [moduleForm, setModuleForm] = useState({
+    title: "",
+    description: "",
+    order: 1
+  });
+
+  // Lesson form states
+  const [lessonForm, setLessonForm] = useState({
+    title: "",
+    description: "",
+    content: "",
+    duration_minutes: 30,
+    order: 1
+  });
   
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -125,6 +150,26 @@ export default function AdminDashboardPage({ user, onLogout }) {
   const [taskPage, setTaskPage] = useState(1);
   const [docPage, setDocPage] = useState(1);
   const itemsPerPage = 10;
+
+  // Quill editor config
+  const quillModules = {
+    toolbar: [
+      [{ 'header': [1, 2, 3, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      ['blockquote', 'code-block'],
+      ['link', 'image'],
+      ['clean']
+    ],
+  };
+
+  const quillFormats = [
+    'header',
+    'bold', 'italic', 'underline', 'strike',
+    'list', 'bullet',
+    'blockquote', 'code-block',
+    'link', 'image'
+  ];
 
   useEffect(() => {
     fetchData();
