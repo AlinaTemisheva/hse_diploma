@@ -643,8 +643,177 @@ async def get_admin_stats():
         "teachers_count": len(teachers_db),
         "tasks_count": len(tasks_db),
         "courses_count": len(MOCK_COURSES),
-        "documents_count": len(documents_db)
+        "documents_count": len(documents_db),
+        "modules_count": len(modules_db),
+        "lessons_count": len(lessons_db)
     }
+
+# ============ Admin Module Routes ============
+
+@api_router.get("/admin/modules", response_model=List[Module])
+async def get_admin_modules():
+    # Update lessons count for each module
+    modules_with_counts = []
+    for module in sorted(modules_db, key=lambda x: x.order):
+        lessons_count = len([l for l in lessons_db if l.module_id == module.id])
+        modules_with_counts.append(Module(
+            id=module.id,
+            title=module.title,
+            description=module.description,
+            order=module.order,
+            lessons_count=lessons_count
+        ))
+    return modules_with_counts
+
+@api_router.post("/admin/modules", response_model=Module)
+async def create_module(module_data: ModuleCreate):
+    new_id = str(uuid.uuid4())
+    
+    new_module = Module(
+        id=new_id,
+        title=module_data.title,
+        description=module_data.description,
+        order=module_data.order if module_data.order > 0 else len(modules_db) + 1,
+        lessons_count=0
+    )
+    
+    modules_db.append(new_module)
+    return new_module
+
+@api_router.put("/admin/modules/{module_id}", response_model=Module)
+async def update_module(module_id: str, module_data: ModuleUpdate):
+    for module in modules_db:
+        if module.id == module_id:
+            if module_data.title is not None:
+                module.title = module_data.title
+            if module_data.description is not None:
+                module.description = module_data.description
+            if module_data.order is not None:
+                module.order = module_data.order
+            
+            lessons_count = len([l for l in lessons_db if l.module_id == module.id])
+            return Module(
+                id=module.id,
+                title=module.title,
+                description=module.description,
+                order=module.order,
+                lessons_count=lessons_count
+            )
+    raise HTTPException(status_code=404, detail="Модуль не найден")
+
+@api_router.delete("/admin/modules/{module_id}")
+async def delete_module(module_id: str):
+    global modules_db, lessons_db
+    for i, module in enumerate(modules_db):
+        if module.id == module_id:
+            # Delete all lessons in this module
+            lessons_db = [l for l in lessons_db if l.module_id != module_id]
+            modules_db.pop(i)
+            return {"success": True, "message": "Модуль и все его уроки удалены"}
+    raise HTTPException(status_code=404, detail="Модуль не найден")
+
+# ============ Admin Lesson Routes ============
+
+@api_router.get("/admin/modules/{module_id}/lessons", response_model=List[Lesson])
+async def get_module_lessons(module_id: str):
+    # Check if module exists
+    module_exists = any(m.id == module_id for m in modules_db)
+    if not module_exists:
+        raise HTTPException(status_code=404, detail="Модуль не найден")
+    
+    module_lessons = [l for l in lessons_db if l.module_id == module_id]
+    return sorted(module_lessons, key=lambda x: x.order)
+
+@api_router.get("/admin/lessons/{lesson_id}", response_model=Lesson)
+async def get_lesson(lesson_id: str):
+    for lesson in lessons_db:
+        if lesson.id == lesson_id:
+            return lesson
+    raise HTTPException(status_code=404, detail="Урок не найден")
+
+@api_router.post("/admin/lessons", response_model=Lesson)
+async def create_lesson(lesson_data: LessonCreate):
+    # Check if module exists
+    module_exists = any(m.id == lesson_data.module_id for m in modules_db)
+    if not module_exists:
+        raise HTTPException(status_code=404, detail="Модуль не найден")
+    
+    new_id = str(uuid.uuid4())
+    
+    # Calculate order if not provided
+    module_lessons = [l for l in lessons_db if l.module_id == lesson_data.module_id]
+    order = lesson_data.order if lesson_data.order > 0 else len(module_lessons) + 1
+    
+    new_lesson = Lesson(
+        id=new_id,
+        module_id=lesson_data.module_id,
+        title=lesson_data.title,
+        description=lesson_data.description,
+        content=lesson_data.content,
+        duration_minutes=lesson_data.duration_minutes,
+        order=order
+    )
+    
+    lessons_db.append(new_lesson)
+    return new_lesson
+
+@api_router.put("/admin/lessons/{lesson_id}", response_model=Lesson)
+async def update_lesson(lesson_id: str, lesson_data: LessonUpdate):
+    for lesson in lessons_db:
+        if lesson.id == lesson_id:
+            if lesson_data.title is not None:
+                lesson.title = lesson_data.title
+            if lesson_data.description is not None:
+                lesson.description = lesson_data.description
+            if lesson_data.content is not None:
+                lesson.content = lesson_data.content
+            if lesson_data.duration_minutes is not None:
+                lesson.duration_minutes = lesson_data.duration_minutes
+            if lesson_data.order is not None:
+                lesson.order = lesson_data.order
+            return lesson
+    raise HTTPException(status_code=404, detail="Урок не найден")
+
+@api_router.delete("/admin/lessons/{lesson_id}")
+async def delete_lesson(lesson_id: str):
+    global lessons_db
+    for i, lesson in enumerate(lessons_db):
+        if lesson.id == lesson_id:
+            lessons_db.pop(i)
+            return {"success": True, "message": "Урок удалён"}
+    raise HTTPException(status_code=404, detail="Урок не найден")
+
+# ============ Public Module/Lesson Routes (for teachers) ============
+
+@api_router.get("/modules", response_model=List[Module])
+async def get_modules():
+    modules_with_counts = []
+    for module in sorted(modules_db, key=lambda x: x.order):
+        lessons_count = len([l for l in lessons_db if l.module_id == module.id])
+        modules_with_counts.append(Module(
+            id=module.id,
+            title=module.title,
+            description=module.description,
+            order=module.order,
+            lessons_count=lessons_count
+        ))
+    return modules_with_counts
+
+@api_router.get("/modules/{module_id}/lessons", response_model=List[Lesson])
+async def get_public_module_lessons(module_id: str):
+    module_exists = any(m.id == module_id for m in modules_db)
+    if not module_exists:
+        raise HTTPException(status_code=404, detail="Модуль не найден")
+    
+    module_lessons = [l for l in lessons_db if l.module_id == module_id]
+    return sorted(module_lessons, key=lambda x: x.order)
+
+@api_router.get("/lessons/{lesson_id}", response_model=Lesson)
+async def get_public_lesson(lesson_id: str):
+    for lesson in lessons_db:
+        if lesson.id == lesson_id:
+            return lesson
+    raise HTTPException(status_code=404, detail="Урок не найден")
 
 # Include the router in the main app
 app.include_router(api_router)
