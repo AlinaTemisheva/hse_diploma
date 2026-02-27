@@ -228,7 +228,7 @@ MOCK_SERVICES = [
 ]
 
 # ============ In-memory state for tasks ============
-task_states = {task.id: task.completed for task in MOCK_TASKS}
+task_states = {task.id: task.completed for task in tasks_db}
 
 # ============ Helper Functions ============
 
