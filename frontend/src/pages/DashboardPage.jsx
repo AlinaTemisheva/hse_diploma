@@ -48,7 +48,7 @@ const DOC_TYPE_COLORS = {
   zip: { bg: 'bg-amber-100', text: 'text-amber-700' }
 };
 
-export default function DashboardPage({ user, onLogout }) {
+export default function DashboardPage({ user, userId, onLogout }) {
   const [tasks, setTasks] = useState([]);
   const [courses, setCourses] = useState([]);
   const [documents, setDocuments] = useState([]);
@@ -63,6 +63,9 @@ export default function DashboardPage({ user, onLogout }) {
   const [selectedModule, setSelectedModule] = useState(null);
   const [moduleLessons, setModuleLessons] = useState([]);
   const [selectedLesson, setSelectedLesson] = useState(null);
+  
+  // Get user ID from props or localStorage
+  const currentUserId = userId || localStorage.getItem("onboarding_user_id") || "1";
 
   useEffect(() => {
     fetchData();
