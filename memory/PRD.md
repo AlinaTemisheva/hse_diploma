@@ -63,9 +63,9 @@
 - [x] Admin panel - Documents management
 - [x] Admin panel - Modules & Lessons management with WYSIWYG
 
-### P1 (Next Priority)
-- [ ] File upload backend (for teacher avatars and documents)
-- [ ] Connect frontend file uploads to backend
+### P1 (Completed)
+- [x] File upload backend (POST /api/upload, GET /api/uploads/{filename})
+- [x] Connect frontend file uploads to backend (avatars, documents)
 
 ### P2 (Enhancements)
 - [ ] Progress persistence in MongoDB
