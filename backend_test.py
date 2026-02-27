@@ -897,6 +897,9 @@ def main():
     print("\n📋 Testing Tasks CRUD Operations")
     tester.test_tasks_crud_operations()
     
+    print("\n📄 Testing Documents CRUD Operations")
+    tester.test_documents_crud_operations()
+    
     print(f"\n📊 Final Results: {tester.tests_passed}/{tester.tests_run} tests passed")
     print("=" * 60)
     
