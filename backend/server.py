@@ -513,7 +513,49 @@ async def get_admin_courses():
 
 @api_router.get("/admin/documents", response_model=List[Document])
 async def get_admin_documents():
-    return MOCK_DOCUMENTS
+    return sorted(documents_db, key=lambda x: x.order)
+
+@api_router.post("/admin/documents", response_model=Document)
+async def create_document(doc_data: DocumentCreate):
+    new_id = str(uuid.uuid4())
+    
+    new_doc = Document(
+        id=new_id,
+        title=doc_data.title,
+        description=doc_data.description,
+        file_type=doc_data.file_type,
+        download_url=doc_data.download_url,
+        order=doc_data.order if doc_data.order > 0 else len(documents_db) + 1
+    )
+    
+    documents_db.append(new_doc)
+    return new_doc
+
+@api_router.put("/admin/documents/{doc_id}", response_model=Document)
+async def update_document(doc_id: str, doc_data: DocumentUpdate):
+    for doc in documents_db:
+        if doc.id == doc_id:
+            if doc_data.title is not None:
+                doc.title = doc_data.title
+            if doc_data.description is not None:
+                doc.description = doc_data.description
+            if doc_data.file_type is not None:
+                doc.file_type = doc_data.file_type
+            if doc_data.download_url is not None:
+                doc.download_url = doc_data.download_url
+            if doc_data.order is not None:
+                doc.order = doc_data.order
+            return doc
+    raise HTTPException(status_code=404, detail="Документ не найден")
+
+@api_router.delete("/admin/documents/{doc_id}")
+async def delete_document(doc_id: str):
+    global documents_db
+    for i, doc in enumerate(documents_db):
+        if doc.id == doc_id:
+            documents_db.pop(i)
+            return {"success": True, "message": "Документ удален"}
+    raise HTTPException(status_code=404, detail="Документ не найден")
 
 @api_router.get("/admin/stats")
 async def get_admin_stats():
@@ -521,7 +563,7 @@ async def get_admin_stats():
         "teachers_count": len(teachers_db),
         "tasks_count": len(tasks_db),
         "courses_count": len(MOCK_COURSES),
-        "documents_count": len(MOCK_DOCUMENTS)
+        "documents_count": len(documents_db)
     }
 
 # Include the router in the main app
