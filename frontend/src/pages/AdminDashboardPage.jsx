@@ -310,6 +310,86 @@ export default function AdminDashboardPage({ user, onLogout }) {
     }
   };
 
+  // ============ Document Functions ============
+  const openDocCreate = () => {
+    setSheetType('document');
+    setIsEditMode(false);
+    setEditingItem(null);
+    setDocForm({ title: "", description: "", file_type: "doc", download_url: "", order: documents.length + 1 });
+    setIsSheetOpen(true);
+  };
+
+  const openDocEdit = (doc) => {
+    setSheetType('document');
+    setIsEditMode(true);
+    setEditingItem(doc);
+    setDocForm({
+      title: doc.title,
+      description: doc.description,
+      file_type: doc.file_type,
+      download_url: doc.download_url || "",
+      order: doc.order
+    });
+    setIsSheetOpen(true);
+  };
+
+  const handleDocSubmit = async () => {
+    if (!docForm.title.trim()) {
+      toast.error("Введите название документа");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      if (isEditMode && editingItem) {
+        const response = await axios.put(`${API}/admin/documents/${editingItem.id}`, {
+          title: docForm.title,
+          description: docForm.description,
+          file_type: docForm.file_type,
+          download_url: docForm.download_url || null,
+          order: docForm.order
+        });
+        setDocuments(documents.map(d => d.id === editingItem.id ? response.data : d));
+        toast.success("Документ обновлён");
+      } else {
+        const response = await axios.post(`${API}/admin/documents`, {
+          title: docForm.title,
+          description: docForm.description,
+          file_type: docForm.file_type,
+          download_url: docForm.download_url || null,
+          order: docForm.order
+        });
+        setDocuments([...documents, response.data]);
+        toast.success("Документ добавлен");
+      }
+      closeSheet();
+    } catch (error) {
+      const message = error.response?.data?.detail || "Ошибка сохранения";
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDocDelete = async () => {
+    if (!editingItem) return;
+    
+    if (!window.confirm("Удалить этот документ?")) return;
+
+    setIsSubmitting(true);
+    try {
+      await axios.delete(`${API}/admin/documents/${editingItem.id}`);
+      setDocuments(documents.filter(d => d.id !== editingItem.id));
+      toast.success("Документ удалён");
+      closeSheet();
+    } catch (error) {
+      toast.error("Ошибка удаления");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   // ============ Common Functions ============
   const closeSheet = () => {
     setIsSheetOpen(false);
@@ -326,9 +406,12 @@ export default function AdminDashboardPage({ user, onLogout }) {
     return name.substring(0, 2).toUpperCase();
   };
 
-  // Paginated tasks
-  const paginatedTasks = tasks.slice((taskPage - 1) * tasksPerPage, taskPage * tasksPerPage);
-  const totalTaskPages = Math.ceil(tasks.length / tasksPerPage);
+  // Paginated items
+  const paginatedTasks = tasks.slice((taskPage - 1) * itemsPerPage, taskPage * itemsPerPage);
+  const totalTaskPages = Math.ceil(tasks.length / itemsPerPage);
+  
+  const paginatedDocs = documents.slice((docPage - 1) * itemsPerPage, docPage * itemsPerPage);
+  const totalDocPages = Math.ceil(documents.length / itemsPerPage);
 
   // ============ Render Content ============
   const renderContent = () => {
