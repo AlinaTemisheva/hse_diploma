@@ -136,6 +136,84 @@ class OnboardingAPITester:
             return True
         return False
 
+    def test_admin_login_success(self):
+        """Test successful admin login"""
+        success, response = self.run_test(
+            "Admin Login Success",
+            "POST", 
+            "auth/login",
+            200,
+            data={"email": "test_admin@test.ru", "password": "test_admin"}
+        )
+        if success and response.get('role') == 'admin':
+            print(f"   Admin User: {response['user']['name']}")
+            return True
+        return False
+
+    def test_get_admin_teachers(self):
+        """Test fetching teachers (admin endpoint)"""
+        success, response = self.run_test("Get Admin Teachers", "GET", "admin/teachers", 200)
+        if success and isinstance(response, list):
+            print(f"   Found {len(response)} teachers")
+            if len(response) > 0:
+                first_teacher = response[0]
+                print(f"   First teacher: {first_teacher.get('name')} ({first_teacher.get('email')}) - {first_teacher.get('status')}")
+            return True
+        return False
+
+    def test_create_teacher(self):
+        """Test creating a new teacher"""
+        test_teacher = {
+            "name": "Новый Преподаватель", 
+            "email": "new@test.ru"
+        }
+        
+        success, response = self.run_test(
+            "Create Teacher",
+            "POST",
+            "admin/teachers",
+            200,
+            data=test_teacher
+        )
+        
+        if success and response.get('name') == test_teacher['name']:
+            print(f"   Created teacher: {response['name']} ({response['email']}) - Status: {response['status']}")
+            return True, response.get('id')
+        return False, None
+
+    def test_get_admin_tasks(self):
+        """Test fetching admin tasks"""
+        success, response = self.run_test("Get Admin Tasks", "GET", "admin/tasks", 200)
+        if success and isinstance(response, list):
+            print(f"   Found {len(response)} admin tasks")
+            return True
+        return False
+
+    def test_get_admin_courses(self):
+        """Test fetching admin courses"""
+        success, response = self.run_test("Get Admin Courses", "GET", "admin/courses", 200)
+        if success and isinstance(response, list):
+            print(f"   Found {len(response)} admin courses")
+            return True
+        return False
+
+    def test_get_admin_documents(self):
+        """Test fetching admin documents"""
+        success, response = self.run_test("Get Admin Documents", "GET", "admin/documents", 200)
+        if success and isinstance(response, list):
+            print(f"   Found {len(response)} admin documents")
+            return True
+        return False
+
+    def test_get_admin_stats(self):
+        """Test fetching admin stats"""
+        success, response = self.run_test("Get Admin Stats", "GET", "admin/stats", 200)
+        if success and 'teachers_count' in response:
+            print(f"   Teachers: {response['teachers_count']}, Tasks: {response['tasks_count']}")
+            print(f"   Courses: {response['courses_count']}, Documents: {response['documents_count']}")
+            return True
+        return False
+
 def main():
     print("🚀 Starting Onboarding API Tests")
     print("=" * 50)
