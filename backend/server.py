@@ -446,7 +446,50 @@ async def update_teacher_status(teacher_id: str, status: str):
 
 @api_router.get("/admin/tasks", response_model=List[Task])
 async def get_admin_tasks():
-    return MOCK_TASKS
+    return sorted(tasks_db, key=lambda x: x.order)
+
+@api_router.post("/admin/tasks", response_model=Task)
+async def create_task(task_data: TaskCreate):
+    # Generate new ID
+    new_id = str(uuid.uuid4())
+    
+    # Create new task
+    new_task = Task(
+        id=new_id,
+        title=task_data.title,
+        description=task_data.description,
+        order=task_data.order if task_data.order > 0 else len(tasks_db) + 1,
+        completed=False
+    )
+    
+    tasks_db.append(new_task)
+    task_states[new_id] = False
+    
+    return new_task
+
+@api_router.put("/admin/tasks/{task_id}", response_model=Task)
+async def update_task(task_id: str, task_data: TaskUpdate):
+    for task in tasks_db:
+        if task.id == task_id:
+            if task_data.title is not None:
+                task.title = task_data.title
+            if task_data.description is not None:
+                task.description = task_data.description
+            if task_data.order is not None:
+                task.order = task_data.order
+            return task
+    raise HTTPException(status_code=404, detail="Задача не найдена")
+
+@api_router.delete("/admin/tasks/{task_id}")
+async def delete_task(task_id: str):
+    global tasks_db
+    for i, task in enumerate(tasks_db):
+        if task.id == task_id:
+            tasks_db.pop(i)
+            if task_id in task_states:
+                del task_states[task_id]
+            return {"success": True, "message": "Задача удалена"}
+    raise HTTPException(status_code=404, detail="Задача не найдена")
 
 @api_router.get("/admin/courses", response_model=List[Course])
 async def get_admin_courses():
