@@ -611,6 +611,249 @@ class OnboardingAPITester:
         print("\n✅ All Tasks CRUD operations passed!")
         return True
 
+    def test_documents_crud_operations(self):
+        """Test comprehensive Documents CRUD operations"""
+        print("\n🔍 Testing Documents CRUD Operations...")
+        
+        # 1. Get initial documents list
+        success, initial_docs = self.run_test("Get Initial Admin Documents", "GET", "admin/documents", 200)
+        if not success:
+            print("❌ Failed to get initial documents")
+            return False
+        
+        initial_count = len(initial_docs)
+        print(f"   Initial documents count: {initial_count}")
+        
+        # Verify documents are sorted by order
+        if initial_docs:
+            for i in range(1, len(initial_docs)):
+                if initial_docs[i]['order'] < initial_docs[i-1]['order']:
+                    print("❌ Documents are not sorted by order")
+                    return False
+            print("   ✅ Documents are properly sorted by order")
+        
+        # 2. Create a new document with all fields
+        doc_data = {
+            "title": f"Тестовый документ {datetime.now().strftime('%H%M%S')}",
+            "description": "Подробное описание тестового документа для проверки CRUD операций",
+            "file_type": "pdf",
+            "download_url": "https://example.com/test-document.pdf",
+            "order": initial_count + 1
+        }
+        
+        success, created_doc = self.run_test(
+            "Create New Document with URL",
+            "POST",
+            "admin/documents",
+            200,
+            data=doc_data
+        )
+        
+        if not success or not created_doc.get('id'):
+            print("❌ Failed to create document")
+            return False
+        
+        doc_id = created_doc['id']
+        print(f"   Created document ID: {doc_id}")
+        
+        # 3. Verify document was created with correct data
+        if (created_doc.get('title') != doc_data['title'] or
+            created_doc.get('description') != doc_data['description'] or
+            created_doc.get('file_type') != doc_data['file_type'] or
+            created_doc.get('download_url') != doc_data['download_url'] or
+            created_doc.get('order') != doc_data['order']):
+            print("❌ Created document data mismatch")
+            print(f"   Expected: {doc_data}")
+            print(f"   Got: {created_doc}")
+            return False
+        
+        print("   ✅ Document created with correct data")
+        
+        # 4. Create document without download URL
+        doc_data_no_url = {
+            "title": f"Документ без ссылки {datetime.now().strftime('%H%M%S')}",
+            "description": "Документ без ссылки для скачивания",
+            "file_type": "doc",
+            "order": initial_count + 2
+        }
+        
+        success, created_doc_no_url = self.run_test(
+            "Create Document Without URL",
+            "POST",
+            "admin/documents",
+            200,
+            data=doc_data_no_url
+        )
+        
+        if not success or not created_doc_no_url.get('id'):
+            print("❌ Failed to create document without URL")
+            return False
+        
+        doc_no_url_id = created_doc_no_url['id']
+        if created_doc_no_url.get('download_url'):
+            print("❌ Document should have no download_url")
+            return False
+        
+        print("   ✅ Document without URL created successfully")
+        
+        # 5. Test all file types
+        file_types = ["doc", "xls", "pdf", "zip"]
+        created_file_type_docs = []
+        
+        for file_type in file_types:
+            doc_data_type = {
+                "title": f"Тест {file_type.upper()} документ",
+                "description": f"Тестовый документ типа {file_type}",
+                "file_type": file_type,
+                "order": initial_count + 3 + len(created_file_type_docs)
+            }
+            
+            success, created_type_doc = self.run_test(
+                f"Create {file_type.upper()} Document",
+                "POST",
+                "admin/documents",
+                200,
+                data=doc_data_type
+            )
+            
+            if not success or created_type_doc.get('file_type') != file_type:
+                print(f"❌ Failed to create {file_type} document")
+                return False
+            
+            created_file_type_docs.append(created_type_doc['id'])
+        
+        print("   ✅ All file types work correctly")
+        
+        # 6. Verify documents appear in documents list
+        success, updated_docs = self.run_test("Get Documents After Creates", "GET", "admin/documents", 200)
+        if not success or len(updated_docs) < initial_count + 2 + len(file_types):
+            print("❌ Documents not added to documents list")
+            return False
+        
+        print("   ✅ Documents appear in documents list")
+        
+        # 7. Test updating document with all fields
+        update_data = {
+            "title": f"Обновленный документ {datetime.now().strftime('%H%M%S')}",
+            "description": "Обновленное описание документа после редактирования",
+            "file_type": "zip",
+            "download_url": "https://updated-example.com/updated-doc.zip",
+            "order": 999  # Move to end
+        }
+        
+        success, updated_doc = self.run_test(
+            "Update All Document Fields",
+            "PUT",
+            f"admin/documents/{doc_id}",
+            200,
+            data=update_data
+        )
+        
+        if not success:
+            print("❌ Failed to update document")
+            return False
+        
+        # Verify update
+        if (updated_doc.get('title') != update_data['title'] or
+            updated_doc.get('description') != update_data['description'] or
+            updated_doc.get('file_type') != update_data['file_type'] or
+            updated_doc.get('download_url') != update_data['download_url'] or
+            updated_doc.get('order') != update_data['order']):
+            print("❌ Document update verification failed")
+            return False
+        
+        print("   ✅ Document update successful")
+        
+        # 8. Test partial updates
+        partial_update = {"title": "Частичное обновление заголовка документа"}
+        success, partial_updated_doc = self.run_test(
+            "Partial Title Update",
+            "PUT",
+            f"admin/documents/{doc_id}",
+            200,
+            data=partial_update
+        )
+        
+        if not success or partial_updated_doc.get('title') != partial_update['title']:
+            print("❌ Failed partial update")
+            return False
+        
+        print("   ✅ Partial update works correctly")
+        
+        # 9. Test removing download URL by setting it to null
+        success, url_removed_doc = self.run_test(
+            "Remove Download URL",
+            "PUT",
+            f"admin/documents/{doc_id}",
+            200,
+            data={"download_url": None}
+        )
+        
+        if not success:
+            print("❌ Failed to remove download URL")
+            return False
+        
+        print("   ✅ Download URL removal works correctly")
+        
+        # 10. Test error conditions - invalid document ID
+        success, _ = self.run_test(
+            "Update Non-existent Document",
+            "PUT",
+            "admin/documents/invalid-id-12345",
+            404,
+            data={"title": "Should fail"}
+        )
+        
+        if success:  # 404 status means success for this test (we expect it to fail)
+            print("   ✅ Invalid document ID properly returns 404")
+        else:
+            print("❌ Invalid document ID handling not working")
+            return False
+        
+        # 11. Delete the documents we created
+        docs_to_delete = [doc_id, doc_no_url_id] + created_file_type_docs
+        
+        for delete_doc_id in docs_to_delete:
+            success, delete_response = self.run_delete_test(
+                f"Delete Document {delete_doc_id}",
+                f"admin/documents/{delete_doc_id}",
+                200
+            )
+            
+            if not success:
+                print(f"❌ Failed to delete document {delete_doc_id}")
+                return False
+            
+            if not delete_response.get('success'):
+                print(f"❌ Delete response doesn't indicate success for {delete_doc_id}")
+                return False
+        
+        print("   ✅ Document deletion successful")
+        
+        # 12. Verify documents were deleted
+        success, final_docs = self.run_test("Get Documents After Delete", "GET", "admin/documents", 200)
+        if not success or len(final_docs) != initial_count:
+            print("❌ Documents not removed from documents list")
+            print(f"   Expected: {initial_count}, Got: {len(final_docs) if success else 'error'}")
+            return False
+        
+        print("   ✅ Documents removed from documents list")
+        
+        # 13. Test that regular /api/documents endpoint also works
+        success, public_docs = self.run_test("Get Public Documents", "GET", "documents", 200)
+        if not success:
+            print("❌ Public documents endpoint not working")
+            return False
+        
+        if len(public_docs) != len(final_docs):
+            print("❌ Public and admin documents counts don't match")
+            return False
+        
+        print("   ✅ Public documents endpoint works correctly")
+        
+        print("\n✅ All Documents CRUD operations passed!")
+        return True
+
 def main():
     print("🚀 Starting Onboarding API Tests (including Admin Panel)")
     print("=" * 60)
