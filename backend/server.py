@@ -503,7 +503,7 @@ async def get_admin_documents():
 async def get_admin_stats():
     return {
         "teachers_count": len(teachers_db),
-        "tasks_count": len(MOCK_TASKS),
+        "tasks_count": len(tasks_db),
         "courses_count": len(MOCK_COURSES),
         "documents_count": len(MOCK_DOCUMENTS)
     }
