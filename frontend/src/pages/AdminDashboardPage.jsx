@@ -900,6 +900,140 @@ export default function AdminDashboardPage({ user, onLogout }) {
       );
     }
 
+    if (sheetType === 'document') {
+      return (
+        <>
+          <SheetHeader className="flex-row items-center justify-between space-y-0 pb-6">
+            <SheetTitle className="text-xl font-semibold">
+              {isEditMode ? "Редактирование документа" : "Добавление документа"}
+            </SheetTitle>
+            <button onClick={closeSheet} className="text-gray-400 hover:text-gray-600">
+              <X className="w-5 h-5" />
+            </button>
+          </SheetHeader>
+          
+          <div className="flex-1 space-y-6 overflow-y-auto">
+            {/* Document Title */}
+            <div className="space-y-2">
+              <Label className="text-base font-medium">Название документа *</Label>
+              <Input
+                value={docForm.title}
+                onChange={(e) => setDocForm({ ...docForm, title: e.target.value })}
+                className="h-12 rounded-lg border-gray-200"
+                placeholder="Введите название документа"
+                data-testid="doc-title-input"
+              />
+            </div>
+
+            {/* File Type */}
+            <div className="space-y-2">
+              <Label className="text-base font-medium">Тип файла</Label>
+              <Select 
+                value={docForm.file_type} 
+                onValueChange={(value) => setDocForm({ ...docForm, file_type: value })}
+              >
+                <SelectTrigger className="h-12 rounded-lg border-gray-200" data-testid="doc-type-select">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="doc">DOC</SelectItem>
+                  <SelectItem value="xls">XLS</SelectItem>
+                  <SelectItem value="pdf">PDF</SelectItem>
+                  <SelectItem value="zip">ZIP</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Download URL */}
+            <div className="space-y-2">
+              <Label className="text-base font-medium">Ссылка на файл</Label>
+              <Input
+                value={docForm.download_url}
+                onChange={(e) => setDocForm({ ...docForm, download_url: e.target.value })}
+                className="h-12 rounded-lg border-gray-200"
+                placeholder="https://..."
+                data-testid="doc-url-input"
+              />
+              <p className="text-sm text-gray-500">
+                Ссылка на Google Docs, Dropbox или другой файловый сервис
+              </p>
+            </div>
+
+            {/* Document Description */}
+            <div className="space-y-2">
+              <Label className="text-base font-medium">Описание</Label>
+              <Textarea
+                value={docForm.description}
+                onChange={(e) => setDocForm({ ...docForm, description: e.target.value })}
+                className="min-h-[100px] rounded-lg border-gray-200 resize-none"
+                placeholder="Описание документа"
+                data-testid="doc-description-input"
+              />
+            </div>
+
+            {/* Order Number */}
+            <div className="space-y-2">
+              <Label className="text-base font-medium">Порядковый номер</Label>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setDocForm({ ...docForm, order: Math.max(1, docForm.order - 1) })}
+                  className="w-12 h-12 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                  data-testid="doc-order-minus-btn"
+                >
+                  <Minus className="w-5 h-5 text-gray-600" />
+                </button>
+                <Input
+                  type="number"
+                  value={docForm.order}
+                  onChange={(e) => setDocForm({ ...docForm, order: Math.max(1, parseInt(e.target.value) || 1) })}
+                  className="h-12 w-24 text-center rounded-lg border-gray-200"
+                  min="1"
+                  data-testid="doc-order-input"
+                />
+                <button
+                  type="button"
+                  onClick={() => setDocForm({ ...docForm, order: docForm.order + 1 })}
+                  className="w-12 h-12 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                  data-testid="doc-order-plus-btn"
+                >
+                  <Plus className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <SheetFooter className="flex-col gap-3 mt-auto pt-6">
+            <Button
+              onClick={handleDocSubmit}
+              disabled={isSubmitting}
+              className="w-full h-12 bg-[#1B318E] hover:bg-[#152570] text-white rounded-lg"
+              data-testid="save-doc-btn"
+            >
+              {isSubmitting ? "Сохранение..." : "Сохранить"}
+            </Button>
+            
+            {isEditMode && (
+              <Button 
+                variant="outline" 
+                onClick={handleDocDelete}
+                disabled={isSubmitting}
+                className="w-full h-12 rounded-lg border-red-200 text-red-600 hover:bg-red-50"
+                data-testid="delete-doc-btn"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Удалить документ
+              </Button>
+            )}
+            
+            <Button variant="outline" onClick={closeSheet} className="w-full h-12 rounded-lg border-gray-200">
+              Закрыть
+            </Button>
+          </SheetFooter>
+        </>
+      );
+    }
+
     return null;
   };
 
