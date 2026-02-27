@@ -22,12 +22,13 @@ function App() {
     }
   }, []);
 
-  const handleLogin = (userData, role) => {
+  const handleLogin = (userData, role, userId) => {
     setUser(userData);
     setUserRole(role);
     setIsAuthenticated(true);
     localStorage.setItem("onboarding_user", JSON.stringify(userData));
     localStorage.setItem("onboarding_role", role);
+    localStorage.setItem("onboarding_user_id", userId);
   };
 
   const handleLogout = () => {
@@ -36,13 +37,18 @@ function App() {
     setIsAuthenticated(false);
     localStorage.removeItem("onboarding_user");
     localStorage.removeItem("onboarding_role");
+    localStorage.removeItem("onboarding_user_id");
+  };
+
+  const getUserId = () => {
+    return localStorage.getItem("onboarding_user_id") || "1";
   };
 
   const getDashboardComponent = () => {
     if (userRole === "admin") {
       return <AdminDashboardPage user={user} onLogout={handleLogout} />;
     }
-    return <DashboardPage user={user} onLogout={handleLogout} />;
+    return <DashboardPage user={user} userId={getUserId()} onLogout={handleLogout} />;
   };
 
   return (
