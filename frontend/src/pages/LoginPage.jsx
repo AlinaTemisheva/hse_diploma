@@ -64,7 +64,7 @@ export default function LoginPage({ onLogin }) {
 
       if (response.data.success) {
         toast.success("Добро пожаловать!");
-        onLogin(response.data.user, response.data.role);
+        onLogin(response.data.user, response.data.role, response.data.user_id);
       }
     } catch (error) {
       const message = error.response?.data?.detail || "Ошибка входа";
