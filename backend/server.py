@@ -341,13 +341,16 @@ async def create_teacher(teacher_data: TeacherCreate):
     # Generate password
     password = generate_password()
     
+    # Use provided avatar or generate one
+    avatar_url = teacher_data.avatar_url or f"https://api.dicebear.com/7.x/avataaars/svg?seed={teacher_data.name.replace(' ', '')}"
+    
     # Create new teacher
     new_teacher = Teacher(
         id=str(uuid.uuid4()),
         name=teacher_data.name,
         email=teacher_data.email,
         status="in_progress",
-        avatar_url=f"https://api.dicebear.com/7.x/avataaars/svg?seed={teacher_data.name.replace(' ', '')}",
+        avatar_url=avatar_url,
         password=password,
         created_at=datetime.now(timezone.utc).strftime("%Y-%m-%d")
     )
@@ -363,6 +366,53 @@ async def create_teacher(teacher_data: TeacherCreate):
         avatar_url=new_teacher.avatar_url,
         created_at=new_teacher.created_at
     )
+
+@api_router.put("/admin/teachers/{teacher_id}", response_model=Teacher)
+async def update_teacher(teacher_id: str, teacher_data: TeacherUpdate):
+    for teacher in teachers_db:
+        if teacher.id == teacher_id:
+            # Check if new email already exists (if email is being changed)
+            if teacher_data.email and teacher_data.email != teacher.email:
+                for t in teachers_db:
+                    if t.email == teacher_data.email and t.id != teacher_id:
+                        raise HTTPException(
+                            status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Преподаватель с таким email уже существует"
+                        )
+            
+            # Update fields
+            if teacher_data.name:
+                teacher.name = teacher_data.name
+            if teacher_data.email:
+                teacher.email = teacher_data.email
+            if teacher_data.status:
+                teacher.status = teacher_data.status
+            if teacher_data.avatar_url:
+                teacher.avatar_url = teacher_data.avatar_url
+            
+            return Teacher(
+                id=teacher.id,
+                name=teacher.name,
+                email=teacher.email,
+                status=teacher.status,
+                avatar_url=teacher.avatar_url,
+                created_at=teacher.created_at
+            )
+    raise HTTPException(status_code=404, detail="Преподаватель не найден")
+
+@api_router.get("/admin/teachers/{teacher_id}", response_model=Teacher)
+async def get_teacher(teacher_id: str):
+    for teacher in teachers_db:
+        if teacher.id == teacher_id:
+            return Teacher(
+                id=teacher.id,
+                name=teacher.name,
+                email=teacher.email,
+                status=teacher.status,
+                avatar_url=teacher.avatar_url,
+                created_at=teacher.created_at
+            )
+    raise HTTPException(status_code=404, detail="Преподаватель не найден")
 
 @api_router.delete("/admin/teachers/{teacher_id}")
 async def delete_teacher(teacher_id: str):
