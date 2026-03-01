@@ -13,19 +13,19 @@ const API = `${BACKEND_URL}/api`;
 const CAROUSEL_SLIDES = [
   {
     id: 1,
-    image: "/images/slide1-whale.svg",
+    image: "/images/slide1.png",
     title: "Разберитесь в правилах за 15 минут",
     description: "Ключевые требования и цифровые сервисы — кратко и по делу, без погружения в лишние регламенты"
   },
   {
     id: 2,
-    image: "/images/slide2-meditation.svg",
+    image: "/images/slide2.png",
     title: "Осваивайте только то, что нужно для работы",
     description: "Короткие практические блоки, которые можно пройти за несколько минут и сразу применить в работе"
   },
   {
     id: 3,
-    image: "/images/slide3-idea.svg",
+    image: "/images/slide3.png",
     title: "Минимум бюрократии — Максимум ясности",
     description: "Все требования, сервисы и обязательные шаги — в одном месте, чтобы вы были готовы к занятию без лишних уточнений"
   }
