@@ -126,17 +126,11 @@ export default function LoginPage({ onLogin }) {
           <div className="w-full max-w-[360px] mx-auto">
             {/* Logo */}
             <div className="flex items-center gap-3 mb-12">
-              <div className="w-12 h-12 rounded-full bg-[#1B318E] flex items-center justify-center overflow-hidden">
-                <img 
-                  src="/images/hse-logo.svg" 
-                  alt="ВШЭ" 
-                  className="w-full h-full"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.parentElement.innerHTML = '<span class="text-white text-xl font-bold">В</span>';
-                  }}
-                />
-              </div>
+              <img 
+                src="/images/logo.png" 
+                alt="Школа экономики" 
+                className="w-12 h-12 rounded-full object-cover"
+              />
               <h1 className="text-2xl font-bold text-[#1B318E] font-heading">
                 Онбординг
               </h1>
