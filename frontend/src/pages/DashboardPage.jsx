@@ -195,9 +195,11 @@ export default function DashboardPage({ user, userId, onLogout }) {
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 h-16">
         <div className="max-w-[1000px] mx-auto w-full px-4 md:px-8 flex items-center justify-between h-full">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#1B318E] flex items-center justify-center">
-              <span className="text-white text-lg font-bold">В</span>
-            </div>
+            <img 
+              src="/images/logo.png" 
+              alt="Школа экономики" 
+              className="w-10 h-10 rounded-full object-cover"
+            />
             <h1 className="text-xl font-bold text-[#1B318E] font-heading">
               Онбординг
             </h1>
