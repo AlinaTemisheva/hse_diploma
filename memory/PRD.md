@@ -26,6 +26,13 @@
 
 ## What's Been Implemented
 
+### Mar 02, 2026 - Teacher Login/Password Feature
+- ✅ Admin can set login (email) and password for teachers
+- ✅ Password field in create/edit teacher form
+- ✅ Auto-generated password if not provided
+- ✅ Teachers can login with credentials set by admin
+- ✅ New users have access to all content (tasks, modules, documents)
+
 ### Feb 27, 2026 - User ID Bug Fix
 - ✅ Fixed user_id passing from login to all API endpoints
 - ✅ User ID stored in localStorage as 'onboarding_user_id'
