@@ -26,7 +26,10 @@ import {
   ChevronRight,
   Clock,
   Edit,
-  GraduationCap
+  GraduationCap,
+  Eye,
+  EyeOff,
+  Copy
 } from "lucide-react";
 import axios from "axios";
 
@@ -106,11 +109,14 @@ export default function AdminDashboardPage({ user, onLogout }) {
   const [teacherForm, setTeacherForm] = useState({ 
     name: "", 
     email: "", 
+    password: "",
     status: "in_progress",
     avatar_url: "" 
   });
   const [selectedAvatar, setSelectedAvatar] = useState(null);
   const [customAvatarUrl, setCustomAvatarUrl] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [generatedPassword, setGeneratedPassword] = useState("");
   
   // Task form states
   const [taskForm, setTaskForm] = useState({
@@ -207,9 +213,11 @@ export default function AdminDashboardPage({ user, onLogout }) {
     setSheetType('teacher');
     setIsEditMode(false);
     setEditingItem(null);
-    setTeacherForm({ name: "", email: "", status: "in_progress", avatar_url: "" });
+    setTeacherForm({ name: "", email: "", password: "", status: "in_progress", avatar_url: "" });
     setSelectedAvatar(null);
     setCustomAvatarUrl("");
+    setShowPassword(false);
+    setGeneratedPassword("");
     setIsSheetOpen(true);
   };
 
@@ -220,6 +228,7 @@ export default function AdminDashboardPage({ user, onLogout }) {
     setTeacherForm({
       name: teacher.name,
       email: teacher.email,
+      password: "", // Don't show current password
       status: teacher.status,
       avatar_url: teacher.avatar_url
     });
@@ -231,6 +240,8 @@ export default function AdminDashboardPage({ user, onLogout }) {
       setSelectedAvatar(null);
       setCustomAvatarUrl(teacher.avatar_url || "");
     }
+    setShowPassword(false);
+    setGeneratedPassword("");
     setIsSheetOpen(true);
   };
 
@@ -258,6 +269,7 @@ export default function AdminDashboardPage({ user, onLogout }) {
         const response = await axios.put(`${API}/admin/teachers/${editingItem.id}`, {
           name: teacherForm.name,
           email: teacherForm.email,
+          password: teacherForm.password || undefined, // Only send if not empty
           status: teacherForm.status,
           avatar_url: avatarUrl || undefined
         });
@@ -267,10 +279,17 @@ export default function AdminDashboardPage({ user, onLogout }) {
         const response = await axios.post(`${API}/admin/teachers`, {
           name: teacherForm.name,
           email: teacherForm.email,
+          password: teacherForm.password || undefined, // Will auto-generate if empty
           avatar_url: avatarUrl || undefined
         });
         setTeachers([...teachers, response.data]);
-        toast.success("Преподаватель добавлен");
+        // Show generated password if auto-generated
+        if (response.data.password && !teacherForm.password) {
+          setGeneratedPassword(response.data.password);
+          toast.success(`Преподаватель добавлен. Пароль: ${response.data.password}`, { duration: 10000 });
+        } else {
+          toast.success("Преподаватель добавлен");
+        }
       }
       closeSheet();
     } catch (error) {
@@ -1090,7 +1109,7 @@ export default function AdminDashboardPage({ user, onLogout }) {
             
             {/* Email Field */}
             <div className="space-y-2">
-              <Label className="text-base font-medium">Email *</Label>
+              <Label className="text-base font-medium">Email (логин) *</Label>
               <Input
                 type="email"
                 value={teacherForm.email}
@@ -1099,9 +1118,38 @@ export default function AdminDashboardPage({ user, onLogout }) {
                 placeholder="email@hse.ru"
                 data-testid="teacher-email-input"
               />
+            </div>
+
+            {/* Password Field */}
+            <div className="space-y-2">
+              <Label className="text-base font-medium">
+                Пароль {!isEditMode && "(оставьте пустым для автогенерации)"}
+              </Label>
+              <div className="relative">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  value={teacherForm.password}
+                  onChange={(e) => setTeacherForm({ ...teacherForm, password: e.target.value })}
+                  className="h-12 rounded-lg border-gray-200 pr-10"
+                  placeholder={isEditMode ? "Оставьте пустым, чтобы не менять" : "Введите пароль или оставьте пустым"}
+                  data-testid="teacher-password-input"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
               {!isEditMode && (
                 <p className="text-sm text-gray-500">
-                  Пароль от личного кабинета будет сформирован автоматически
+                  Если не указать пароль, он будет сгенерирован автоматически
+                </p>
+              )}
+              {isEditMode && (
+                <p className="text-sm text-gray-500">
+                  Оставьте пустым, если не хотите менять пароль
                 </p>
               )}
             </div>

@@ -115,11 +115,13 @@ class Teacher(BaseModel):
 class TeacherCreate(BaseModel):
     name: str
     email: str
+    password: Optional[str] = None  # If not provided, will be auto-generated
     avatar_url: Optional[str] = None
 
 class TeacherUpdate(BaseModel):
     name: Optional[str] = None
     email: Optional[str] = None
+    password: Optional[str] = None  # Allow password change
     status: Optional[str] = None
     avatar_url: Optional[str] = None
 
@@ -619,7 +621,8 @@ async def create_teacher(teacher_data: TeacherCreate):
         raise HTTPException(status_code=400, detail="Пользователь с таким email уже существует")
     
     new_id = str(uuid.uuid4())
-    password = generate_password()
+    # Use provided password or generate one
+    password = teacher_data.password if teacher_data.password else generate_password()
     
     teacher = {
         "id": new_id,
@@ -634,7 +637,8 @@ async def create_teacher(teacher_data: TeacherCreate):
     await db.teachers.insert_one(teacher)
     del teacher["_id"]
     
-    return {**teacher, "generated_password": password}
+    # Return teacher with password (only on creation)
+    return {**teacher, "password": password}
 
 @api_router.put("/admin/teachers/{teacher_id}")
 async def update_teacher(teacher_id: str, teacher_data: TeacherUpdate):
@@ -647,6 +651,8 @@ async def update_teacher(teacher_id: str, teacher_data: TeacherUpdate):
         update["name"] = teacher_data.name
     if teacher_data.email is not None:
         update["email"] = teacher_data.email
+    if teacher_data.password is not None and teacher_data.password.strip():
+        update["password"] = teacher_data.password
     if teacher_data.status is not None:
         update["status"] = teacher_data.status
     if teacher_data.avatar_url is not None:
