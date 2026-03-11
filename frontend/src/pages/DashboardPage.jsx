@@ -360,14 +360,12 @@ export default function DashboardPage({ user, userId, onLogout }) {
                   onClick={() => openModuleLessons(module)}
                   data-testid={`module-${module.id}`}
                 >
-                  <div className="course-image flex items-center justify-center bg-purple-100">
-                    <svg viewBox="0 0 80 80" className="w-16 h-16">
-                      <circle cx="40" cy="30" r="15" fill="#FFE4C4" />
-                      <rect x="25" y="45" width="30" height="25" rx="3" fill="#9333EA" opacity="0.3" />
-                      <circle cx="35" cy="28" r="2" fill="#333" />
-                      <circle cx="45" cy="28" r="2" fill="#333" />
-                      <path d="M35 35 Q40 38 45 35" fill="none" stroke="#333" strokeWidth="1.5" />
-                    </svg>
+                  <div className="course-image overflow-hidden">
+                    <img 
+                      src="/images/course-card.png" 
+                      alt="Курс"
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <div className="course-content flex-1">
                     <h4 className="course-title">
