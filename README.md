@@ -3,7 +3,7 @@ MVP цифрового продукта для онбординга пригла
 
 # 🌐 Web Application
 Доступно как с компьютера, так и с мобильных устройств. Требуются данные для авторизации
-🔗 [Click me]([https://github.com/AlinaTemisheva/hse_diploma](https://figma-to-web-31.emergent.host))
+🔗 [Click me]([https://github.com/AlinaTemisheva/hse_diploma](https://figma-to-web-31.emergent.host)
 
 # 📁 Структура
 ```text
